@@ -14,6 +14,7 @@ function OrderDetail() {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [approving, setApproving] = useState(false);
+  const [rejecting, setRejecting] = useState(false);
   
   // Inline edit state
   const [isEditingAddress, setIsEditingAddress] = useState(false);
@@ -160,6 +161,8 @@ function OrderDetail() {
     fetchOrder();
   }, [id]);
 
+  const [rejecting, setRejecting] = useState(false);
+
   const handleApprovePayment = async () => {
     setApproving(true);
     try {
@@ -169,6 +172,36 @@ function OrderDetail() {
       alert("Failed to approve payment status.");
     } finally {
       setApproving(false);
+    }
+  };
+
+  const handleRejectPayment = async () => {
+    const reasonPrompt = language === 'la'
+      ? 'ກະລຸນາໃສ່ເຫດຜົນໃນການປະຕິເສດການຊຳລະເງິນ (ເຊັ່ນ: ສະລິບບໍ່ຖືກຕ້ອງ, ໂອນເງິນບໍ່ຄົບ):'
+      : language === 'th'
+      ? 'กรุณาระบุเหตุผลในการปฏิเสธการชำระเงิน (เช่น สลิปไม่ถูกต้อง, โอนเงินไม่ครบ):'
+      : 'Please enter the reason for rejecting this payment (e.g. Invalid transfer slip, incorrect transfer amount):';
+
+    const reason = prompt(reasonPrompt);
+    if (reason === null) return;
+    if (!reason.trim()) {
+      alert(language === 'la' ? 'ກະລຸນາໃສ່ເຫດຜົນ' : language === 'th' ? 'กรุณาระบุเหตุผล' : 'Rejection reason is required.');
+      return;
+    }
+
+    setRejecting(true);
+    try {
+      await api.put('/orders/update_status.php', {
+        id: order.id,
+        status: 'payment_rejected',
+        rejection_reason: reason.trim()
+      });
+      setOrder({ ...order, status: 'payment_rejected', rejection_reason: reason.trim() });
+    } catch (err) {
+      console.error(err);
+      alert("Failed to reject payment status.");
+    } finally {
+      setRejecting(false);
     }
   };
 
@@ -585,13 +618,22 @@ function OrderDetail() {
                 </div>
               )}
 
-              <button 
-                onClick={handleApprovePayment} 
-                disabled={approving}
-                className="w-full bg-[#8A9A5B] hover:bg-dark text-white py-3 uppercase tracking-widest text-xs font-medium transition-colors rounded shadow-sm disabled:opacity-50 cursor-pointer"
-              >
-                {approving ? (language === 'la' ? 'ກຳລັງກວດສອບ...' : language === 'th' ? 'กำลังตรวจสอบ...' : 'Verifying...') : (language === 'la' ? 'ອະນຸມັດການຊຳລະ' : language === 'th' ? 'อนุมัติการชำระเงิน' : 'Approve Payment')}
-              </button>
+              <div className="flex flex-col sm:flex-row gap-2 pt-2">
+                <button 
+                  onClick={handleApprovePayment} 
+                  disabled={approving || rejecting}
+                  className="flex-1 bg-[#8A9A5B] hover:bg-dark text-white py-3 uppercase tracking-widest text-xs font-semibold transition-colors rounded shadow-sm disabled:opacity-50 cursor-pointer text-center"
+                >
+                  {approving ? (language === 'la' ? 'ກຳລັງກວດສອບ...' : language === 'th' ? 'กำลังตรวจสอบ...' : 'Verifying...') : (language === 'la' ? 'ອະນຸມັດການຊຳລະ' : language === 'th' ? 'อนุมัติการชำระเงิน' : 'Approve Payment')}
+                </button>
+                <button 
+                  onClick={handleRejectPayment} 
+                  disabled={approving || rejecting}
+                  className="flex-1 bg-rose-600 hover:bg-rose-700 text-white py-3 uppercase tracking-widest text-xs font-semibold transition-colors rounded shadow-sm disabled:opacity-50 cursor-pointer text-center"
+                >
+                  {rejecting ? (language === 'la' ? 'ກຳລັງດຳເນີນການ...' : language === 'th' ? 'กำลังดำเนินการ...' : 'Rejecting...') : (language === 'la' ? 'ປະຕິເສດການຊຳລະ' : language === 'th' ? 'ปฏิเสธการชำระเงิน' : 'Reject Payment')}
+                </button>
+              </div>
             </div>
           )}
 
