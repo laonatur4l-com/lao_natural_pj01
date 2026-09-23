@@ -261,8 +261,8 @@ function Checkout() {
                     </p>
                   </div>
                   
-                  {/* Currency Selection Tabs — Large & Prominent */}
-                  <div className="flex items-center gap-2 bg-[#FDFBF7] p-1.5 border-2 border-[#8A9A5B]/30 rounded-2xl shadow-sm">
+                  {/* Currency Selection Tabs — Fully Responsive Grid for Mobile */}
+                  <div className="grid grid-cols-3 gap-1.5 bg-[#FDFBF7] p-1.5 border-2 border-[#8A9A5B]/30 rounded-2xl shadow-sm w-full md:w-auto">
                     {[
                       { code: 'LAK', flag: '🇱🇦', label: 'LAK (₭)' },
                       { code: 'THB', flag: '🇹🇭', label: 'THB (฿)' },
@@ -272,14 +272,14 @@ function Checkout() {
                         key={cur.code}
                         type="button"
                         onClick={() => setActiveQrCurrency(cur.code)}
-                        className={`flex items-center gap-2 px-5 py-2.5 md:px-6 md:py-3 text-sm md:text-base font-extrabold rounded-xl transition-all cursor-pointer ${
+                        className={`flex items-center justify-center gap-1 sm:gap-2 px-2 py-2 md:px-5 md:py-2.5 text-xs sm:text-sm md:text-base font-extrabold rounded-xl transition-all cursor-pointer text-center ${
                           activeQrCurrency === cur.code
-                            ? 'bg-[#8A9A5B] text-white shadow-md scale-105 border border-[#7A8A4B]'
+                            ? 'bg-[#8A9A5B] text-white shadow-md border border-[#7A8A4B]'
                             : 'text-gray-700 hover:text-dark hover:bg-white/80'
                         }`}
                       >
-                        <span className="text-lg md:text-xl">{cur.flag}</span>
-                        <span>{cur.label}</span>
+                        <span className="text-sm sm:text-base md:text-lg">{cur.flag}</span>
+                        <span className="truncate">{cur.label}</span>
                       </button>
                     ))}
                   </div>
@@ -367,12 +367,12 @@ function Checkout() {
                   <label className="block text-xs uppercase tracking-widest text-gray-500 mb-2 font-semibold">{t('proof_desc')}</label>
                   
                   <div className="flex flex-col sm:flex-row gap-6 items-start">
-                    <label className="cursor-pointer bg-[#FDFBF7] hover:bg-gray-50 border border-dashed border-gray-300 hover:border-[#8A9A5B] transition-colors p-4 rounded-xl flex flex-col items-center justify-center text-center w-full sm:w-48 h-32 shrink-0 group">
+                    <label className="cursor-pointer bg-[#FDFBF7] hover:bg-gray-50 border border-dashed border-gray-300 hover:border-[#8A9A5B] transition-colors p-4 rounded-xl flex flex-col items-center justify-center text-center w-full sm:w-48 h-32 shrink-0 group relative overflow-hidden">
                       <input 
                         type="file" 
                         accept="image/*" 
                         onChange={handleScreenshotChange} 
-                        className="hidden" 
+                        className="opacity-0 absolute inset-0 w-full h-full cursor-pointer z-10" 
                         disabled={uploadingScreenshot}
                       />
                       {uploadingScreenshot ? (
