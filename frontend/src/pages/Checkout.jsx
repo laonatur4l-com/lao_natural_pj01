@@ -147,8 +147,9 @@ function Checkout() {
   const handlePlaceOrder = async (e) => {
     e.preventDefault();
     if (!paymentScreenshot) {
-      setError(language === 'la' ? 'ກະລຸນາອັບໂຫຼດສະລິບການໂອນເງິນກ່ອນຢືນຢັນການສັ່ງຊື້.' : language === 'th' ? 'กรุณาอัปโหลดสลิปการโอนเงินก่อนทำการสั่งซื้อ' : 'Please upload your payment screenshot before placing your order.');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setError(language === 'la' ? '⚠️ ກະລຸນາເລືອກ/ອັບໂຫຼດສະລິບການໂອນເງິນກ່ອນຢືນຢັນການສັ່ງຊື້.' : language === 'th' ? '⚠️ กรุณาเลือก/อัปโหลดสลิปการโอนเงินก่อนทำการสั่งซื้อ' : '⚠️ Please select/upload your payment transfer slip before placing your order.');
+      const el = document.getElementById('payment-upload-section');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
       return;
     }
     setLoading(true);
@@ -366,8 +367,7 @@ function Checkout() {
                   </div>
                 </div>
                 
-                {/* Screenshot Upload Field */}
-                <div className="border-t border-dashed border-gray-200 pt-6">
+                <div id="payment-upload-section" className="border-t border-dashed border-gray-200 pt-6">
                   <label className="block text-xs uppercase tracking-widest text-gray-500 mb-2 font-semibold">{t('proof_desc')}</label>
                   
                   <div className="flex flex-col sm:flex-row gap-6 items-start">
@@ -408,10 +408,20 @@ function Checkout() {
               <div className="pt-6">
                 <button 
                   type="submit" 
-                  disabled={loading || uploadingScreenshot || !paymentScreenshot}
-                  className="w-full bg-dark text-white py-4 uppercase tracking-widest text-sm hover:bg-black transition-colors disabled:opacity-50 cursor-pointer"
+                  disabled={loading || uploadingScreenshot}
+                  className={`w-full py-4 uppercase tracking-widest text-sm font-semibold transition-all cursor-pointer rounded-xl ${
+                    paymentScreenshot 
+                      ? 'bg-dark hover:bg-black text-white shadow-lg' 
+                      : 'bg-[#8A9A5B] text-white hover:bg-dark'
+                  } disabled:opacity-50`}
                 >
-                  {loading ? 'Processing...' : t('place_order')}
+                  {loading 
+                    ? (language === 'la' ? 'ກຳລັງດຳເນີນການ...' : language === 'th' ? 'กำลังดำเนินการ...' : 'Processing...') 
+                    : (paymentScreenshot 
+                        ? t('place_order') 
+                        : (language === 'la' ? '📸 ອັບໂຫຼດສະລິບ ເພື່ອຢືນຢັນການສັ່ງຊື້' : language === 'th' ? '📸 อัปโหลดสลิป เพื่อยืนยันการสั่งซื้อ' : '📸 Upload Slip to Place Order')
+                      )
+                  }
                 </button>
                 <p className="text-xs text-center text-gray-500 mt-4">{language === 'la' ? '*ລາຍການສັ່ງຊື້ ແລະ ສະລິບການໂອນເງິນຂອງທ່ານຈະຖືກສົ່ງເພື່ອກວດສອບ.' : language === 'th' ? '*รายการสั่งซื้อและสลิปการโอนเงินของคุณจะถูกส่งเพื่อตรวจสอบ' : '*Your order and payment slip will be submitted for verification.'}</p>
               </div>
