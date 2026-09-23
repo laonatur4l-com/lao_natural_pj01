@@ -27,6 +27,8 @@ router.post('/', authenticate, validateOrderCreate, async (req, res) => {
     const userId = req.user.id;
 
     // 1. Collect all product IDs in order
+    const productIds = items.map(item => item.id);
+
     // 2. Fetch authoritative product data & active promotions from database
     const [prodRes, promoRes] = await Promise.all([
       supabaseAdmin.from('products').select('id, name, price, price_lak, stock, is_deleted').in('id', productIds),
