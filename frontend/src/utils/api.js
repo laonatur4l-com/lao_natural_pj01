@@ -52,20 +52,31 @@ api.interceptors.request.use(config => {
       }
     }
 
-    // Special handling for /orders/update_status.php?id=... -> /orders/:id/status
+    // Helper to safely extract payload object
+    const getPayload = (data) => {
+      if (!data) return {};
+      if (typeof data === 'string') {
+        try { return JSON.parse(data); } catch { return {}; }
+      }
+      return data;
+    };
+
+    // Special handling for /orders/update_status.php -> /orders/:id/status
     if (cleanPath === '/orders/update_status.php') {
       const params = new URLSearchParams(queryString);
-      const orderId = params.get('id') || (config.data ? JSON.parse(typeof config.data === 'string' ? config.data : '{}').id : null);
+      const payload = getPayload(config.data);
+      const orderId = params.get('id') || payload.id;
       if (orderId) {
         config.url = `/orders/${orderId}/status`;
         return config;
       }
     }
 
-    // Special handling for /orders/update_address.php?id=... -> /orders/:id/address
+    // Special handling for /orders/update_address.php -> /orders/:id/address
     if (cleanPath === '/orders/update_address.php') {
       const params = new URLSearchParams(queryString);
-      const orderId = params.get('id') || (config.data ? JSON.parse(typeof config.data === 'string' ? config.data : '{}').id : null);
+      const payload = getPayload(config.data);
+      const orderId = params.get('id') || payload.id;
       if (orderId) {
         config.url = `/orders/${orderId}/address`;
         return config;

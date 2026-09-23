@@ -244,13 +244,17 @@ router.get('/:id', authenticate, async (req, res) => {
 });
 
 /**
- * PUT /api/orders/:id/status
+ * PUT /api/orders/:id/status or PUT /api/orders/status
  * Update order status (Staff/Owner only)
  */
-router.put('/:id/status', authenticate, authorize('owner', 'employee'), validateOrderStatus, async (req, res) => {
+const handleUpdateStatus = async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id && req.params.id !== 'status' ? req.params.id : req.body.id;
     const { status, express_tracking, express_company, rejection_reason } = req.body;
+
+    if (!id || !status) {
+      return res.status(400).json({ error: 'Order ID and status are required.' });
+    }
 
     const updates = { status };
     if (express_tracking !== undefined) updates.express_tracking = express_tracking;
@@ -276,7 +280,10 @@ router.put('/:id/status', authenticate, authorize('owner', 'employee'), validate
     console.error('Update order status exception:', err);
     res.status(500).json({ error: 'Server error updating order status.' });
   }
-});
+};
+
+router.put('/status', authenticate, authorize('owner', 'employee'), handleUpdateStatus);
+router.put('/:id/status', authenticate, authorize('owner', 'employee'), handleUpdateStatus);
 
 /**
  * PUT /api/orders/:id/address
