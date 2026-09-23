@@ -441,7 +441,7 @@ function OrderDetail() {
             )}
           </div>
 
-          {order.payment_screenshot && (
+          {order.payment_screenshot && order.status !== 'pending_payment' && order.status !== 'payment_rejected' && (
             <div className="bg-white border border-gray-100 p-6 rounded-xl shadow-sm">
               <h2 className="text-[10px] uppercase tracking-widest text-gray-400 mb-4">{language === 'la' ? 'ຫຼັກຖານການຊຳລະເງິນ' : language === 'th' ? 'หลักฐานการชำระเงิน' : 'Payment Proof'}</h2>
               <a href={order.payment_screenshot} target="_blank" rel="noopener noreferrer" className="block border border-gray-200 rounded-lg overflow-hidden group hover:border-[#8A9A5B] transition-colors relative">
