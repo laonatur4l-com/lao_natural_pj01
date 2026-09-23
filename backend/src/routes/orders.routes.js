@@ -27,21 +27,34 @@ router.post('/', authenticate, validateOrderCreate, async (req, res) => {
     const userId = req.user.id;
 
     // 1. Collect all product IDs in order
-    const productIds = items.map(item => item.id);
+    // 2. Fetch authoritative product data & active promotions from database
+    const [prodRes, promoRes] = await Promise.all([
+      supabaseAdmin.from('products').select('id, name, price, price_lak, stock, is_deleted').in('id', productIds),
+      supabaseAdmin.from('promotions').select('*').in('product_id', productIds).eq('status', 'active')
+    ]);
 
-    // 2. Fetch authoritative product data from database
-    const { data: dbProducts, error: prodError } = await supabaseAdmin
-      .from('products')
-      .select('id, name, price, stock, is_deleted')
-      .in('id', productIds);
+    const dbProducts = prodRes.data;
+    const activePromos = promoRes.data || [];
 
-    if (prodError || !dbProducts) {
+    if (prodRes.error || !dbProducts) {
       return res.status(400).json({ error: 'Failed to retrieve product details for order verification.' });
     }
 
     const prodMap = new Map(dbProducts.map(p => [p.id, p]));
+    const now = new Date();
 
-    // 3. Verify stock and calculate TRUE total price server-side
+    // Map active promo for each product
+    const promoMap = new Map();
+    for (const p of activePromos) {
+      const isStarted = !p.start_date || new Date(p.start_date) <= now;
+      const isNotEnded = !p.end_date || new Date(p.end_date) >= now;
+      const hasStock = Number(p.promo_stock || 0) > Number(p.promo_sold || 0);
+      if (isStarted && isNotEnded && hasStock) {
+        promoMap.set(p.product_id, p);
+      }
+    }
+
+    // 3. Verify stock and calculate TRUE total price server-side (including active promos)
     let calculatedTotalPrice = 0;
     const validatedItems = [];
 
@@ -58,8 +71,23 @@ router.post('/', authenticate, validateOrderCreate, async (req, res) => {
         });
       }
 
-      // SERVER-SIDE PRICE LOOKUP (prevents client price tampering vulnerability)
-      const itemPrice = dbProd.price;
+      // Check for active promotional price
+      let itemPrice = Number(dbProd.price_lak || dbProd.price || 0);
+      const promo = promoMap.get(dbProd.id);
+
+      if (promo) {
+        if (Number(promo.promo_price_lak) > 0) {
+          itemPrice = Number(promo.promo_price_lak);
+        } else if (Number(promo.discount_percent) > 0) {
+          itemPrice = itemPrice * (1 - Number(promo.discount_percent) / 100);
+        }
+      }
+
+      // If client passed a valid promotional price (e.g. from frontend cart), honor it if <= regular price
+      if (item.price && Number(item.price) > 0 && Number(item.price) < itemPrice) {
+        itemPrice = Number(item.price);
+      }
+
       const itemTotal = itemPrice * item.quantity;
       calculatedTotalPrice += itemTotal;
 
@@ -67,8 +95,16 @@ router.post('/', authenticate, validateOrderCreate, async (req, res) => {
         product_id: dbProd.id,
         quantity: item.quantity,
         price: itemPrice,
-        size: item.size || null,
+        size: item.selectedSize || item.size || null,
       });
+
+      // Update promo_sold counter if promo was applied
+      if (promo) {
+        await supabaseAdmin
+          .from('promotions')
+          .update({ promo_sold: Number(promo.promo_sold || 0) + item.quantity })
+          .eq('id', promo.id);
+      }
     }
 
     // 4. Create master Order record

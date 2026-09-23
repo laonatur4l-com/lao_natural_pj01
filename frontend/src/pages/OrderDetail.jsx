@@ -441,11 +441,11 @@ function OrderDetail() {
             )}
           </div>
 
-          {order.status !== 'payment_rejected' && order.payment_screenshot && (
+          {order.payment_screenshot && (
             <div className="bg-white border border-gray-100 p-6 rounded-xl shadow-sm">
               <h2 className="text-[10px] uppercase tracking-widest text-gray-400 mb-4">{language === 'la' ? 'ຫຼັກຖານການຊຳລະເງິນ' : language === 'th' ? 'หลักฐานการชำระเงิน' : 'Payment Proof'}</h2>
               <a href={order.payment_screenshot} target="_blank" rel="noopener noreferrer" className="block border border-gray-200 rounded-lg overflow-hidden group hover:border-[#8A9A5B] transition-colors relative">
-                <img src={order.payment_screenshot} alt="Payment Screenshot" className="w-full h-48 object-cover group-hover:scale-105 transition-transform" />
+                <img src={order.payment_screenshot} alt="Payment Screenshot" className="w-full h-48 object-contain group-hover:scale-105 transition-transform bg-gray-50" />
                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                   <span className="text-white text-xs font-semibold uppercase tracking-widest">{language === 'la' ? 'ເບິ່ງໃບບິນເຕັມ' : language === 'th' ? 'ดูใบเสร็จฉบับเต็ม' : 'View Full Receipt'}</span>
                 </div>
@@ -566,6 +566,25 @@ function OrderDetail() {
             <div className="bg-amber-50 border border-amber-200 p-6 rounded-xl text-center space-y-4">
               <h2 className="text-sm font-semibold text-amber-800 uppercase tracking-widest">{language === 'la' ? 'ລໍຖ້າການກວດສອບ' : language === 'th' ? 'รอการตรวจสอบ' : 'Awaiting Verification'}</h2>
               <p className="text-xs text-amber-700">{language === 'la' ? `ກະລຸນາກວດສອບສະລິບໂອນເງິນໃຫ້ກົງກັບຍອດລວມ ${formatCurrency(order.total_price)} ໃນ BCEL One ກ່ອນອະນຸມັດ.` : language === 'th' ? `กรุณาตรวจสอบสลิปโอนเงินให้ตรงกับยอดรวม ${formatCurrency(order.total_price)} ใน BCEL One ก่อนอนุมัติ` : `Please verify the payment screenshot transfer slip matches the total of ${formatCurrency(order.total_price)} in BCEL One before approving.`}</p>
+              
+              {order.payment_screenshot ? (
+                <div className="my-2 border border-amber-200 rounded-lg overflow-hidden bg-white p-2">
+                  <p className="text-[10px] text-amber-800 uppercase tracking-widest font-semibold mb-2 text-center">
+                    {language === 'la' ? 'ສະລິບໂອນເງິນຈາກລູກຄ້າ:' : language === 'th' ? 'สลิปโอนเงินจากลูกค้า:' : 'Customer Transfer Slip:'}
+                  </p>
+                  <a href={order.payment_screenshot} target="_blank" rel="noopener noreferrer" className="block relative group">
+                    <img src={order.payment_screenshot} alt="Payment Receipt" className="w-full h-52 object-contain rounded bg-gray-50" />
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded">
+                      <span className="text-white text-xs font-semibold uppercase tracking-widest">{language === 'la' ? 'ເບິ່ງໃບບິນເຕັມ' : language === 'th' ? 'ดูใบเสร็จฉบับเต็ม' : 'View Full Receipt'}</span>
+                    </div>
+                  </a>
+                </div>
+              ) : (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-xs font-semibold">
+                  ⚠️ {language === 'la' ? 'ບໍ່ມີສະລິບໂອນເງິນ' : language === 'th' ? 'ไม่มีสลิปโอนเงิน' : 'No payment slip uploaded'}
+                </div>
+              )}
+
               <button 
                 onClick={handleApprovePayment} 
                 disabled={approving}
