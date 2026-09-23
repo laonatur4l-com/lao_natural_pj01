@@ -11,6 +11,7 @@ function OrderDetail() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { t, language } = useLanguage();
+  const isStaff = user && (user.role === 'owner' || user.role === 'employee');
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [approving, setApproving] = useState(false);
@@ -474,7 +475,7 @@ function OrderDetail() {
             )}
           </div>
 
-          {order.payment_screenshot && order.status !== 'pending_payment' && order.status !== 'payment_rejected' && (
+          {order.payment_screenshot && order.status !== 'pending_payment' && (isStaff || order.status !== 'payment_rejected') && (
             <div className="bg-white border border-gray-100 p-6 rounded-xl shadow-sm">
               <h2 className="text-[10px] uppercase tracking-widest text-gray-400 mb-4">{language === 'la' ? 'ຫຼັກຖານການຊຳລະເງິນ' : language === 'th' ? 'หลักฐานการชำระเงิน' : 'Payment Proof'}</h2>
               <a href={order.payment_screenshot} target="_blank" rel="noopener noreferrer" className="block border border-gray-200 rounded-lg overflow-hidden group hover:border-[#8A9A5B] transition-colors relative">
@@ -486,7 +487,7 @@ function OrderDetail() {
             </div>
           )}
 
-          {order.status === 'payment_rejected' && (
+          {!isStaff && order.status === 'payment_rejected' && (
             <div className="bg-white border border-gray-100 p-6 rounded-xl shadow-sm space-y-4">
               <h2 className="text-[10px] uppercase tracking-widest text-gray-400">
                 {language === 'la' ? 'ຫຼັກຖານການຊຳລະເງິນ' : language === 'th' ? 'หลักฐานการชำระเงิน' : 'Payment Proof'}
@@ -595,7 +596,7 @@ function OrderDetail() {
             </div>
           )}
 
-          {user && (user.role === 'owner' || user.role === 'employee') && order.status === 'pending_payment' && (
+          {isStaff && order.status === 'pending_payment' && (
             <div className="bg-amber-50 border border-amber-200 p-6 rounded-xl text-center space-y-4">
               <h2 className="text-sm font-semibold text-amber-800 uppercase tracking-widest">{language === 'la' ? 'ລໍຖ້າການກວດສອບ' : language === 'th' ? 'รอการตรวจสอบ' : 'Awaiting Verification'}</h2>
               <p className="text-xs text-amber-700">{language === 'la' ? `ກະລຸນາກວດສອບສະລິບໂອນເງິນໃຫ້ກົງກັບຍອດລວມ ${formatCurrency(order.total_price)} ໃນ BCEL One ກ່ອນອະນຸມັດ.` : language === 'th' ? `กรุณาตรวจสอบสลิปโอนเงินให้ตรงกับยอดรวม ${formatCurrency(order.total_price)} ใน BCEL One ก่อนอนุมัติ` : `Please verify the payment screenshot transfer slip matches the total of ${formatCurrency(order.total_price)} in BCEL One before approving.`}</p>
