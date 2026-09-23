@@ -74,7 +74,12 @@ function Dashboard() {
       <div className="flex justify-between items-end mb-12 border-b border-[#E8DCC4] pb-6">
         <div>
           <h1 className="text-4xl font-serif text-dark mb-2">{t('my_account')}</h1>
-          <p className="text-gray-500 font-light tracking-wide">{language === 'la' ? `ຍິນດີຕ້ອນຮັບກັບຄືນ, ${user.name}` : language === 'th' ? `ยินดีต้อนรับกลับมา, ${user.name}` : `Welcome back, ${user.name}`}</p>
+          <p className="text-gray-500 font-light tracking-wide">
+            {orders.length === 0
+              ? (language === 'la' ? `ຍິນດີຕ້ອນຮັບ, ${user.name}` : language === 'th' ? `ยินดีต้อนรับ, ${user.name}` : `Welcome, ${user.name}`)
+              : (language === 'la' ? `ຍິນດີຕ້ອນຮັບກັບຄືນ, ${user.name}` : language === 'th' ? `ยินดีຕ້ອນຮັບກັບຄືນ, ${user.name}` : `Welcome back, ${user.name}`)
+            }
+          </p>
         </div>
         <button onClick={logout} className="text-sm uppercase tracking-widest text-primary hover:text-dark transition cursor-pointer">
           {t('logout')}

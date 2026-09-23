@@ -20,8 +20,29 @@ export const authenticate = async (req, res, next) => {
     }
 
     // Dev/Mock token handler for local testing
-    if (token.startsWith('mock-jwt-token-')) {
-      const role = token.replace('mock-jwt-token-', '');
+    if (token.startsWith('mock-jwt-token-') || token.startsWith('user-')) {
+      const parts = token.replace('mock-jwt-token-', '').replace('user-', '');
+      const roleOrId = parts;
+
+      // If token specifies user ID (e.g. mock-jwt-token-user-15 or user-15)
+      const idMatch = roleOrId.match(/\d+$/);
+      if (idMatch) {
+        const userId = parseInt(idMatch[0], 10);
+        const { data: dbProfile } = await supabaseAdmin
+          .from('profiles')
+          .select('id, name, email, role, phone, address')
+          .eq('id', userId)
+          .single();
+
+        if (dbProfile) {
+          req.authUser = { id: `mock-${dbProfile.id}`, email: dbProfile.email };
+          req.user = dbProfile;
+          req.token = token;
+          return next();
+        }
+      }
+
+      const role = roleOrId.replace(/-\d+$/, '');
       const mockProfiles = {
         owner: { id: 1, name: 'Store Owner', email: 'owner@laonatural.com', role: 'owner', phone: '020 5555 9999', address: 'Vientiane Capital' },
         employee: { id: 2, name: 'Staff Member', email: 'employee@laonatural.com', role: 'employee', phone: '020 5555 8888', address: 'Vientiane Capital' },

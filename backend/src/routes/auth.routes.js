@@ -248,7 +248,7 @@ router.post('/register', validateRegister, async (req, res) => {
       console.warn('Database profile insert warning:', dbErr.message);
     }
 
-    const jwtToken = `mock-jwt-token-user`;
+    const jwtToken = `mock-jwt-token-user-${userObj.id}`;
 
     return res.status(201).json({
       message: 'User created successfully.',
