@@ -21,7 +21,7 @@ router.post('/', authenticate, validateOrderCreate, async (req, res) => {
   try {
     const {
       items, shipping_name, shipping_phone, shipping_address,
-      express_company, express_tracking,
+      express_company, express_tracking, payment_screenshot
     } = req.body;
 
     const userId = req.user.id;
@@ -119,6 +119,7 @@ router.post('/', authenticate, validateOrderCreate, async (req, res) => {
       shipping_name: shipping_name || req.user.name,
       shipping_phone: shipping_phone || req.user.phone,
       shipping_address: shipping_address || req.user.address,
+      payment_screenshot: payment_screenshot || null,
     };
 
     const { data: createdOrder, error: orderError } = await supabaseAdmin
