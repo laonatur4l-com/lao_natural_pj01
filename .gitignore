@@ -9,6 +9,8 @@ dist/
 build/
 *.log
 
-# System files
+# System & Internal Docs
 .DS_Store
 Thumbs.db
+explaindatabase.md
+testing.md
