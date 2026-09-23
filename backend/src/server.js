@@ -64,19 +64,19 @@ const globalLimiter = rateLimit({
 app.use('/api', globalLimiter);
 
 // ─── API Routes ──────────────────────────────────────────────────
-app.use('/api/auth', authRoutes);
-app.use('/api/user', userRoutes);
-app.use('/api/products', productsRoutes);
-app.use('/api/orders', ordersRoutes);
-app.use('/api/admin', adminRoutes);
-app.use('/api/categories', categoriesRoutes);
-app.use('/api/banners', bannersRoutes);
-app.use('/api/distributors', distributorsRoutes);
-app.use('/api/promotions', promotionsRoutes);
-app.use('/api/exchange-rates', exchangeRatesRoutes);
+app.use(['/api/auth', '/auth'], authRoutes);
+app.use(['/api/user', '/user'], userRoutes);
+app.use(['/api/products', '/products'], productsRoutes);
+app.use(['/api/orders', '/orders'], ordersRoutes);
+app.use(['/api/admin', '/admin'], adminRoutes);
+app.use(['/api/categories', '/categories'], categoriesRoutes);
+app.use(['/api/banners', '/banners'], bannersRoutes);
+app.use(['/api/distributors', '/distributors'], distributorsRoutes);
+app.use(['/api/promotions', '/promotions'], promotionsRoutes);
+app.use(['/api/exchange-rates', '/exchange-rates'], exchangeRatesRoutes);
 
 // Health check endpoint
-app.get('/api/health', (req, res) => {
+app.get(['/api/health', '/health'], (req, res) => {
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),

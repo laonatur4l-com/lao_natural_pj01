@@ -1,7 +1,11 @@
 import axios from 'axios';
 
 // Node.js Express Backend API URL (default: http://localhost:3001/api)
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+let rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+if (rawApiUrl && !rawApiUrl.endsWith('/api') && !rawApiUrl.endsWith('/api/')) {
+  rawApiUrl = rawApiUrl.replace(/\/+$/, '') + '/api';
+}
+const API_URL = rawApiUrl;
 
 const api = axios.create({
   baseURL: API_URL,
