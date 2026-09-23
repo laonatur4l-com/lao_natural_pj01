@@ -1,10 +1,12 @@
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingBag, User, Menu, Shield, Briefcase, Globe } from 'lucide-react';
+import { ShoppingBag, User, Menu, Shield, Briefcase, Globe, X } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 
 function Navbar() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { count } = useCart();
   const { user, logout } = useAuth();
   const { language, setLanguage, t } = useLanguage();
@@ -12,11 +14,13 @@ function Navbar() {
 
   const handleLogout = () => {
     logout();
+    setMobileMenuOpen(false);
     navigate('/login');
   };
 
   const handleHomeClick = (e) => {
     e.preventDefault();
+    setMobileMenuOpen(false);
     if (window.location.pathname === '/') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
@@ -27,6 +31,7 @@ function Navbar() {
 
   const handleShopClick = (e) => {
     e.preventDefault();
+    setMobileMenuOpen(false);
     if (window.location.pathname === '/products') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
@@ -37,6 +42,7 @@ function Navbar() {
 
   const handleOurStoryClick = (e) => {
     e.preventDefault();
+    setMobileMenuOpen(false);
     if (window.location.pathname === '/') {
       const el = document.getElementById('story');
       if (el) {
@@ -52,8 +58,12 @@ function Navbar() {
       <div className="container mx-auto px-4 lg:px-8 flex items-center justify-between">
         
         {/* Mobile menu button */}
-        <button className="md:hidden p-2 text-dark">
-          <Menu size={24} />
+        <button 
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="md:hidden p-2 text-dark hover:text-primary transition-colors cursor-pointer"
+          aria-label="Toggle mobile menu"
+        >
+          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
 
         {/* Logo */}
@@ -128,6 +138,53 @@ function Navbar() {
           </Link>
         </div>
       </div>
+
+      {/* Mobile Menu Panel */}
+      {mobileMenuOpen && (
+        <div className="md:hidden border-t border-[#E8DCC4] bg-[#FDFBF7] mt-4 px-6 py-6 space-y-4 shadow-lg animate-fadeIn">
+          <nav className="flex flex-col space-y-4">
+            <a href="/" onClick={handleHomeClick} className="text-dark hover:text-primary transition-colors uppercase tracking-widest text-sm font-medium border-b border-[#E8DCC4]/50 pb-2">
+              {t('home')}
+            </a>
+            <a href="/products" onClick={handleShopClick} className="text-dark hover:text-primary transition-colors uppercase tracking-widest text-sm font-medium border-b border-[#E8DCC4]/50 pb-2">
+              {t('shop')}
+            </a>
+            <a href="/#story" onClick={handleOurStoryClick} className="text-dark hover:text-primary transition-colors uppercase tracking-widest text-sm font-medium border-b border-[#E8DCC4]/50 pb-2">
+              {t('our_story')}
+            </a>
+
+            {user ? (
+              <>
+                <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)} className="text-dark hover:text-primary transition-colors uppercase tracking-widest text-sm font-medium border-b border-[#E8DCC4]/50 pb-2">
+                  {t('my_account')}
+                </Link>
+
+                {user.role === 'owner' && (
+                  <Link to="/admin" onClick={() => setMobileMenuOpen(false)} className="text-[#8A9A5B] hover:text-dark transition-colors uppercase tracking-widest text-sm font-semibold border-b border-[#E8DCC4]/50 pb-2 flex items-center gap-2">
+                    <Shield size={16} />
+                    <span>{t('admin')} Dashboard</span>
+                  </Link>
+                )}
+
+                {(user.role === 'employee' || user.role === 'owner') && (
+                  <Link to="/employee" onClick={() => setMobileMenuOpen(false)} className="text-[#8A9A5B] hover:text-dark transition-colors uppercase tracking-widest text-sm font-semibold border-b border-[#E8DCC4]/50 pb-2 flex items-center gap-2">
+                    <Briefcase size={16} />
+                    <span>{t('portal')}</span>
+                  </Link>
+                )}
+
+                <button onClick={handleLogout} className="text-red-600 hover:text-red-800 transition-colors uppercase tracking-widest text-sm font-medium text-left pt-2">
+                  {t('logout')}
+                </button>
+              </>
+            ) : (
+              <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="text-dark hover:text-primary transition-colors uppercase tracking-widest text-sm font-medium border-b border-[#E8DCC4]/50 pb-2">
+                {t('sign_in')}
+              </Link>
+            )}
+          </nav>
+        </div>
+      )}
     </header>
   );
 }
