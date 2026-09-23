@@ -87,37 +87,41 @@ function Checkout() {
     }
   }, [shippingForm.address]);
 
-  const handleScreenshotChange = async (e) => {
+  const handleScreenshotChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Show preview
-    setScreenshotPreview(URL.createObjectURL(file));
-    setUploadingScreenshot(true);
-    setError('');
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64Url = reader.result;
+      setScreenshotPreview(base64Url);
+      setUploadingScreenshot(true);
+      setError('');
 
-    try {
-      const formDataUpload = new FormData();
-      formDataUpload.append('screenshot', file);
+      try {
+        const formDataUpload = new FormData();
+        formDataUpload.append('screenshot', file);
 
-      const res = await api.post('/orders/upload_screenshot.php', formDataUpload, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
+        const res = await api.post('/orders/upload_screenshot.php', formDataUpload, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+
+        if (res.data?.screenshot_url) {
+          setPaymentScreenshot(res.data.screenshot_url);
+        } else {
+          setPaymentScreenshot(base64Url);
         }
-      });
-
-      if (res.data?.screenshot_url) {
-        setPaymentScreenshot(res.data.screenshot_url);
-      } else {
-        throw new Error('No upload URL returned');
+      } catch (err) {
+        console.warn('Server storage upload notice, using image fallback:', err);
+        setPaymentScreenshot(base64Url);
+      } finally {
+        setUploadingScreenshot(false);
       }
-    } catch (err) {
-      console.error(err);
-      setError('Failed to upload proof of payment. Please try again.');
-      setScreenshotPreview(null);
-    } finally {
-      setUploadingScreenshot(false);
-    }
+    };
+
+    reader.readAsDataURL(file);
   };
 
   // If not logged in, this would be handled by a protected route typically,

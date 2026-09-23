@@ -5,17 +5,16 @@ import { supabaseAdmin } from '../config/supabase.js';
 // Multer configuration — stores files in memory (Buffer) for upload to Supabase Storage
 const storage = multer.memoryStorage();
 
-// File filter — only allow image types
+// File filter — allow all image types including mobile formats (JPEG, PNG, GIF, WebP, HEIC, HEIF)
 const imageFilter = (req, file, cb) => {
-  const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-  if (allowedTypes.includes(file.mimetype)) {
+  if (file.mimetype.startsWith('image/') || /heic|heif|jpg|jpeg|png|gif|webp/i.test(file.originalname)) {
     cb(null, true);
   } else {
-    cb(new Error('Only JPEG, PNG, GIF, and WebP images are allowed.'), false);
+    cb(new Error('Only image files (JPEG, PNG, GIF, WebP, HEIC) are allowed.'), false);
   }
 };
 
-const maxSize = parseInt(process.env.MAX_FILE_SIZE_MB || '8', 10) * 1024 * 1024;
+const maxSize = parseInt(process.env.MAX_FILE_SIZE_MB || '25', 10) * 1024 * 1024;
 
 // Multer instance for single image uploads
 export const upload = multer({
@@ -26,22 +25,29 @@ export const upload = multer({
 
 /**
  * Upload a file buffer to Supabase Storage.
- *
- * @param {Buffer} buffer - The file buffer
- * @param {string} bucket - Supabase Storage bucket name (e.g., 'products', 'banners')
- * @param {string} filename - Desired filename (e.g., 'product_abc123.png')
- * @param {string} mimetype - MIME type of the file
- * @returns {Promise<{url: string, path: string}>} The public URL and storage path
  */
 export const uploadToStorage = async (buffer, bucket, filename, mimetype) => {
   const filePath = `${Date.now()}_${filename}`;
 
-  const { data, error } = await supabaseAdmin.storage
+  let { data, error } = await supabaseAdmin.storage
     .from(bucket)
     .upload(filePath, buffer, {
-      contentType: mimetype,
-      upsert: false,
+      contentType: mimetype || 'image/jpeg',
+      upsert: true,
     });
+
+  // If bucket not found, create public bucket dynamically and retry upload
+  if (error && (error.message?.includes('not found') || error.statusCode === '404' || error.code === 'NoSuchBucket')) {
+    await supabaseAdmin.storage.createBucket(bucket, { public: true }).catch(() => {});
+    const retry = await supabaseAdmin.storage
+      .from(bucket)
+      .upload(filePath, buffer, {
+        contentType: mimetype || 'image/jpeg',
+        upsert: true,
+      });
+    data = retry.data;
+    error = retry.error;
+  }
 
   if (error) {
     throw new Error(`Storage upload failed: ${error.message}`);
