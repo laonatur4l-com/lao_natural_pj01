@@ -76,20 +76,22 @@ function AdminDashboard() {
   }
 
   const ordersList = stats?.orders_list || [];
+  const isPaid = (o) => o.status === 'prepare' || o.status === 'sending' || o.status === 'received';
+
   const filteredOrders = kpiPeriod === 'all'
     ? ordersList
     : ordersList.filter(o => isOrderInPeriod(o.created_at, kpiPeriod));
 
   const periodRevenue = kpiPeriod === 'all'
     ? (stats?.total_revenue || 0)
-    : filteredOrders.reduce((sum, o) => sum + Number(o.total_price || 0), 0);
+    : filteredOrders.filter(isPaid).reduce((sum, o) => sum + Number(o.total_price || 0), 0);
 
   const periodOrdersCount = kpiPeriod === 'all'
     ? (stats?.total_orders || 0)
     : filteredOrders.length;
 
   const todayOrders = ordersList.filter(o => isOrderInPeriod(o.created_at, 'day'));
-  const todayRevenue = todayOrders.reduce((sum, o) => sum + Number(o.total_price || 0), 0);
+  const todayRevenue = todayOrders.filter(isPaid).reduce((sum, o) => sum + Number(o.total_price || 0), 0);
 
   const periodLabelText = 
     kpiPeriod === 'day' ? (language === 'la' ? 'ມື້ນີ້' : language === 'th' ? 'วันนี้' : 'Today') :

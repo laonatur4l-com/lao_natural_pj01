@@ -38,7 +38,9 @@ router.get('/analytics', authenticate, authorize('owner'), async (req, res) => {
         totalOrders = allOrdersList.length;
         recentOrders = allOrdersList.slice(0, 5).map(o => ({ ...o, customer_name: o.shipping_name }));
         allOrdersList.forEach(o => {
-          totalRevenue += parseFloat(o.total_price || 0);
+          if (o.status === 'prepare' || o.status === 'sending' || o.status === 'received') {
+            totalRevenue += parseFloat(o.total_price || 0);
+          }
           if (o.status === 'received') completedOrders++;
         });
       }
