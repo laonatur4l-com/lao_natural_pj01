@@ -162,8 +162,6 @@ function OrderDetail() {
     fetchOrder();
   }, [id]);
 
-  const [rejecting, setRejecting] = useState(false);
-
   const handleApprovePayment = async () => {
     setApproving(true);
     try {
