@@ -48,8 +48,9 @@ router.get('/analytics', authenticate, authorize('owner'), async (req, res) => {
     try {
       const { count: uCount } = await supabaseAdmin
         .from('profiles')
-        .select('*', { count: 'exact', head: true });
-      if (uCount) userCount = uCount;
+        .select('*', { count: 'exact', head: true })
+        .eq('role', 'user');
+      if (typeof uCount === 'number') userCount = uCount;
 
       const { count: eCount } = await supabaseAdmin
         .from('profiles')
