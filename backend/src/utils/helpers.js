@@ -72,3 +72,27 @@ export const validateRequired = (obj, fields) => {
   const missing = fields.filter(f => obj[f] === undefined || obj[f] === null || obj[f] === '');
   return { valid: missing.length === 0, missing };
 };
+
+/**
+ * Ensures that an order's total_price includes 10% VAT and shipping cost.
+ * If the stored total_price in DB equals only the items subtotal, this calculates the true total with VAT.
+ *
+ * @param {object} order
+ * @returns {object} order with total_price reflecting grand total (Subtotal + VAT 10% + Shipping)
+ */
+export const ensureOrderTotalWithVat = (order) => {
+  if (!order) return order;
+  const itemsSubtotal = (order.items || []).reduce((sum, item) => {
+    const itemPrice = Number(item.price_lak || item.price || 0);
+    return sum + (itemPrice * Number(item.quantity || 1));
+  }, 0);
+  if (itemsSubtotal > 0) {
+    const vat = itemsSubtotal * 0.10;
+    const expectedTotal = itemsSubtotal + vat + Number(order.shipping_cost || 0);
+    if (Math.abs(Number(order.total_price || 0) - expectedTotal) > 0.01) {
+      return { ...order, total_price: expectedTotal };
+    }
+  }
+  return order;
+};
+

@@ -3,7 +3,7 @@ import { supabaseAdmin } from '../config/supabase.js';
 import { authenticate } from '../middleware/auth.js';
 import { authorize } from '../middleware/authorize.js';
 import { validateUserCreate, validateImportProduct } from '../middleware/validate.js';
-import { logActivity } from '../utils/helpers.js';
+import { logActivity, ensureOrderTotalWithVat } from '../utils/helpers.js';
 
 const router = express.Router();
 
@@ -25,14 +25,18 @@ router.get('/analytics', authenticate, authorize('owner'), async (req, res) => {
     try {
       const { data: orders } = await supabaseAdmin
         .from('orders')
-        .select('id, shipping_name, total_price, status, created_at')
+        .select(`
+          id, shipping_name, total_price, status, created_at, shipping_cost,
+          items:order_items(id, quantity, price)
+        `)
         .neq('status', 'payment_rejected')
         .order('created_at', { ascending: false });
 
       if (orders) {
-        totalOrders = orders.length;
-        recentOrders = orders.slice(0, 5).map(o => ({ ...o, customer_name: o.shipping_name }));
-        orders.forEach(o => {
+        const processedOrders = orders.map(ensureOrderTotalWithVat);
+        totalOrders = processedOrders.length;
+        recentOrders = processedOrders.slice(0, 5).map(o => ({ ...o, customer_name: o.shipping_name }));
+        processedOrders.forEach(o => {
           totalRevenue += parseFloat(o.total_price || 0);
           if (o.status === 'received') completedOrders++;
         });
@@ -181,10 +185,13 @@ router.get('/employee-analytics', authenticate, authorize('owner', 'employee'), 
 
     const { data: orders } = await supabaseAdmin
       .from('orders')
-      .select('id, shipping_name, total_price, status, created_at')
+      .select(`
+        id, shipping_name, total_price, status, created_at, shipping_cost,
+        items:order_items(id, quantity, price)
+      `)
       .order('created_at', { ascending: false });
 
-    const allOrders = orders || [];
+    const allOrders = (orders || []).map(ensureOrderTotalWithVat);
 
     const newOrders = allOrders.filter(o => o.status === 'pending_payment' || new Date(o.created_at) >= today);
     const pendingOrders = allOrders.filter(o => o.status === 'pending_payment' || o.status === 'prepare');

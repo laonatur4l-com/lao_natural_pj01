@@ -8,7 +8,7 @@ import {
   validateOrderAddress,
 } from '../middleware/validate.js';
 import { upload, uploadToStorage } from '../middleware/upload.js';
-import { logActivity } from '../utils/helpers.js';
+import { logActivity, ensureOrderTotalWithVat } from '../utils/helpers.js';
 
 const router = express.Router();
 
@@ -109,11 +109,14 @@ router.post('/', authenticate, validateOrderCreate, async (req, res) => {
       }
     }
 
-    // 4. Create master Order record
+    // 4. Create master Order record (includes 10% VAT)
+    const vatAmount = calculatedTotalPrice * 0.10;
+    const grandTotalPrice = calculatedTotalPrice + vatAmount;
+
     const newOrder = {
       user_id: userId,
       status: 'pending_payment',
-      total_price: calculatedTotalPrice,
+      total_price: grandTotalPrice,
       express_company: express_company || req.user.express_company || null,
       express_tracking: express_tracking || null,
       shipping_name: shipping_name || req.user.name,
@@ -161,12 +164,12 @@ router.post('/', authenticate, validateOrderCreate, async (req, res) => {
         .eq('id', item.product_id);
     }
 
-    await logActivity(supabaseAdmin, userId, `Created order #${createdOrder.id} for total ₭${calculatedTotalPrice}`);
+    await logActivity(supabaseAdmin, userId, `Created order #${createdOrder.id} for total ₭${grandTotalPrice}`);
 
     res.status(201).json({
       message: 'Order created successfully.',
       order_id: createdOrder.id,
-      total_price: calculatedTotalPrice,
+      total_price: grandTotalPrice,
     });
   } catch (err) {
     console.error('Create order exception:', err);
@@ -203,7 +206,7 @@ router.get('/', authenticate, async (req, res) => {
       return res.json({ data: [] });
     }
 
-    res.json({ data: orders });
+    res.json({ data: orders.map(ensureOrderTotalWithVat) });
   } catch (err) {
     console.error('Fetch orders exception:', err);
     res.json({ data: [] });
@@ -239,7 +242,7 @@ router.get('/:id', authenticate, async (req, res) => {
       return res.status(403).json({ error: 'Access denied.' });
     }
 
-    res.json({ data: order });
+    res.json({ data: ensureOrderTotalWithVat(order) });
   } catch (err) {
     console.error('Single order fetch exception:', err);
     res.status(500).json({ error: 'Server error fetching order detail.' });
