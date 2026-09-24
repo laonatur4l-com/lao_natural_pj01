@@ -21,6 +21,7 @@ router.get('/analytics', authenticate, authorize('owner'), async (req, res) => {
     let totalProducts = 0;
     let lowStockProducts = [];
     let recentOrders = [];
+    let allOrdersList = [];
 
     try {
       const { data: orders } = await supabaseAdmin
@@ -33,10 +34,10 @@ router.get('/analytics', authenticate, authorize('owner'), async (req, res) => {
         .order('created_at', { ascending: false });
 
       if (orders) {
-        const processedOrders = orders.map(ensureOrderTotalWithVat);
-        totalOrders = processedOrders.length;
-        recentOrders = processedOrders.slice(0, 5).map(o => ({ ...o, customer_name: o.shipping_name }));
-        processedOrders.forEach(o => {
+        allOrdersList = orders.map(ensureOrderTotalWithVat);
+        totalOrders = allOrdersList.length;
+        recentOrders = allOrdersList.slice(0, 5).map(o => ({ ...o, customer_name: o.shipping_name }));
+        allOrdersList.forEach(o => {
           totalRevenue += parseFloat(o.total_price || 0);
           if (o.status === 'received') completedOrders++;
         });
@@ -149,7 +150,7 @@ router.get('/analytics', authenticate, authorize('owner'), async (req, res) => {
         recent_orders: recentOrders,
         popular_products: popularProducts,
         employee_sales: employeeSales,
-        orders_list: processedOrders,
+        orders_list: allOrdersList,
       },
     });
   } catch (err) {
