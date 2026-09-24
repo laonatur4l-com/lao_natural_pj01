@@ -148,6 +148,7 @@ router.get('/analytics', authenticate, authorize('owner'), async (req, res) => {
         recent_orders: recentOrders,
         popular_products: popularProducts,
         employee_sales: employeeSales,
+        orders_list: processedOrders,
       },
     });
   } catch (err) {

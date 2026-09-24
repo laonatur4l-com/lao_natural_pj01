@@ -74,24 +74,90 @@ function AdminDashboard() {
     );
   }
 
+  const [kpiPeriod, setKpiPeriod] = useState('all');
+
+  const ordersList = stats?.orders_list || [];
+  const filteredOrders = kpiPeriod === 'all'
+    ? ordersList
+    : ordersList.filter(o => isOrderInPeriod(o.created_at, kpiPeriod));
+
+  const periodRevenue = kpiPeriod === 'all'
+    ? (stats?.total_revenue || 0)
+    : filteredOrders.reduce((sum, o) => sum + Number(o.total_price || 0), 0);
+
+  const periodOrdersCount = kpiPeriod === 'all'
+    ? (stats?.total_orders || 0)
+    : filteredOrders.length;
+
+  const todayOrders = ordersList.filter(o => isOrderInPeriod(o.created_at, 'day'));
+  const todayRevenue = todayOrders.reduce((sum, o) => sum + Number(o.total_price || 0), 0);
+
+  const periodLabelText = 
+    kpiPeriod === 'day' ? (language === 'la' ? 'ມື້ນີ້' : language === 'th' ? 'วันนี้' : 'Today') :
+    kpiPeriod === 'week' ? (language === 'la' ? 'ອາທິດນີ້' : language === 'th' ? 'สัปดาห์นี้' : 'This Week') :
+    kpiPeriod === 'month' ? (language === 'la' ? 'ເດືອນນີ້' : language === 'th' ? 'เดือนนี้' : 'This Month') :
+    kpiPeriod === 'year' ? (language === 'la' ? 'ປີນີ້' : language === 'th' ? 'ปีนี้' : 'This Year') :
+    (language === 'la' ? 'ທັງໝົດ' : language === 'th' ? 'ทั้งหมด' : 'All Time');
+
   const kpiCards = [
-    { label: 'Total Revenue', value: `${formatCurrency(stats?.total_revenue || 0)}`, icon: TrendingUp, color: 'text-emerald-600', bg: 'bg-emerald-50', link: '/admin/total-revenue' },
-    { label: 'Total Orders', value: stats?.total_orders || 0, icon: ShoppingCart, color: 'text-blue-600', bg: 'bg-blue-50', link: '/admin/sell-history' },
-    { label: 'Customers', value: stats?.total_users || 0, icon: Users, color: 'text-violet-600', bg: 'bg-violet-50', link: '/admin/users/customers' },
-    { label: 'Products', value: stats?.total_products || 0, icon: Package, color: 'text-amber-600', bg: 'bg-amber-50', link: '/admin/product-catalog' },
+    { 
+      label: `${language === 'la' ? 'ລາຍຮັບ' : language === 'th' ? 'รายได้' : 'Revenue'} (${periodLabelText})`, 
+      value: `${formatCurrency(periodRevenue)}`, 
+      subtext: kpiPeriod !== 'day' ? `${language === 'la' ? 'ມື້ນີ້' : language === 'th' ? 'วันนี้' : 'Today'}: ${formatCurrency(todayRevenue)}` : null,
+      icon: TrendingUp, 
+      color: 'text-emerald-600', 
+      bg: 'bg-emerald-50', 
+      link: '/admin/total-revenue' 
+    },
+    { 
+      label: `${language === 'la' ? 'ລາຍການສັ່ງຊື້' : language === 'th' ? 'รายการสั่งซื้อ' : 'Orders'} (${periodLabelText})`, 
+      value: periodOrdersCount, 
+      subtext: kpiPeriod !== 'day' ? `${language === 'la' ? 'ມື້ນີ້' : language === 'th' ? 'วันนี้' : 'Today'}: ${todayOrders.length} ${language === 'la' ? 'ລາຍການ' : language === 'th' ? 'รายการ' : 'orders'}` : null,
+      icon: ShoppingCart, 
+      color: 'text-blue-600', 
+      bg: 'bg-blue-50', 
+      link: '/admin/sell-history' 
+    },
+    { label: language === 'la' ? 'ລູກຄ້າ' : language === 'th' ? 'ลูกค้า' : 'Customers', value: stats?.total_users || 0, icon: Users, color: 'text-violet-600', bg: 'bg-violet-50', link: '/admin/users/customers' },
+    { label: language === 'la' ? 'ສິນຄ້າ' : language === 'th' ? 'สินค้า' : 'Products', value: stats?.total_products || 0, icon: Package, color: 'text-amber-600', bg: 'bg-amber-50', link: '/admin/product-catalog' },
   ];
 
   return (
     <AutoTranslate>
     <div className="p-8 max-w-7xl">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-serif text-dark mb-1">
-          Dashboard
-        </h1>
-        <p className="text-gray-400 text-sm">
-          Welcome back, {user?.name}. Here's your store overview.
-        </p>
+      {/* Header with KPI Period Selector */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+        <div>
+          <h1 className="text-3xl font-serif text-dark mb-1">
+            Dashboard
+          </h1>
+          <p className="text-gray-400 text-sm">
+            Welcome back, {user?.name}. Here's your store overview.
+          </p>
+        </div>
+
+        {/* Period Filter Buttons */}
+        <div className="flex items-center gap-1.5 bg-white border border-gray-200 p-1.5 rounded-xl shadow-sm self-start sm:self-auto">
+          {[
+            { id: 'day', label: language === 'la' ? 'ມື້ນີ້' : language === 'th' ? 'วันนี้' : 'Today' },
+            { id: 'week', label: language === 'la' ? 'ອາທິດນີ້' : language === 'th' ? 'สัปดาห์นี้' : 'Week' },
+            { id: 'month', label: language === 'la' ? 'ເດືອນນີ້' : language === 'th' ? 'เดือนนี้' : 'Month' },
+            { id: 'year', label: language === 'la' ? 'ປີນີ້' : language === 'th' ? 'ปีนี้' : 'Year' },
+            { id: 'all', label: language === 'la' ? 'ທັງໝົດ' : language === 'th' ? 'ทั้งหมด' : 'All Time' }
+          ].map(p => (
+            <button
+              key={p.id}
+              onClick={() => setKpiPeriod(p.id)}
+              className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                kpiPeriod === p.id
+                  ? 'bg-[#8A9A5B] text-white shadow-sm'
+                  : 'text-gray-500 hover:bg-gray-100 hover:text-dark'
+              }`}
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* KPI Cards */}
@@ -105,12 +171,15 @@ function AdminDashboard() {
             }`}
           >
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs uppercase tracking-[0.15em] text-gray-400 font-medium">{card.label}</span>
+              <span className="text-[11px] uppercase tracking-[0.12em] text-gray-400 font-semibold">{card.label}</span>
               <div className={`${card.bg} ${card.color} p-2 rounded-lg`}>
                 <card.icon size={16} />
               </div>
             </div>
             <p className="text-2xl font-semibold text-dark">{card.value}</p>
+            {card.subtext && (
+              <p className="text-[11px] text-gray-400 font-medium mt-1">{card.subtext}</p>
+            )}
           </div>
         ))}
       </div>
