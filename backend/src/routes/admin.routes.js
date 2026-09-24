@@ -27,7 +27,7 @@ router.get('/analytics', authenticate, authorize('owner'), async (req, res) => {
       const { data: orders } = await supabaseAdmin
         .from('orders')
         .select(`
-          id, shipping_name, total_price, status, created_at, shipping_cost,
+          id, shipping_name, total_price, status, created_at,
           items:order_items(id, quantity, price)
         `)
         .neq('status', 'payment_rejected')
@@ -189,7 +189,7 @@ router.get('/employee-analytics', authenticate, authorize('owner', 'employee'), 
     const { data: orders } = await supabaseAdmin
       .from('orders')
       .select(`
-        id, shipping_name, total_price, status, created_at, shipping_cost,
+        id, shipping_name, total_price, status, created_at,
         items:order_items(id, quantity, price)
       `)
       .order('created_at', { ascending: false });
