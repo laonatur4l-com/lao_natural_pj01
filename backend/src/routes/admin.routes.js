@@ -197,7 +197,7 @@ router.get('/employee-analytics', authenticate, authorize('owner', 'employee'), 
 
     const newOrders = allOrders.filter(o => o.status === 'pending_payment' || new Date(o.created_at) >= today);
     const pendingOrders = allOrders.filter(o => o.status === 'pending_payment' || o.status === 'prepare');
-    const shippedToday = allOrders.filter(o => o.status === 'sending' || o.status === 'received');
+    const shippedToday = allOrders.filter(o => (o.status === 'sending' || o.status === 'received') && new Date(o.created_at) >= today);
 
     const { count: totalProducts } = await supabaseAdmin
       .from('products')

@@ -83,10 +83,10 @@ function EmployeeDashboard() {
   }
 
   const kpiCards = [
-    { label: 'New Orders', value: stats?.new_orders || 0, icon: ShoppingCart, color: 'text-rose-600', bg: 'bg-rose-50' },
-    { label: 'Pending Orders', value: stats?.pending_orders || 0, icon: Clock, color: 'text-amber-600', bg: 'bg-amber-50' },
-    { label: 'Total Products', value: stats?.total_products || 0, icon: Package, color: 'text-blue-600', bg: 'bg-blue-50' },
-    { label: 'Shipped Today', value: stats?.shipped_today || 0, icon: Truck, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+    { label: language === 'la' ? 'ລາຍການສັ່ງຊື້ໃໝ່' : language === 'th' ? 'รายการสั่งซื้อใหม่' : 'New Orders', value: stats?.new_orders || 0, icon: ShoppingCart, color: 'text-rose-600', bg: 'bg-rose-50' },
+    { label: language === 'la' ? 'ລໍຖ້າດຳເນີນການ' : language === 'th' ? 'รอดำเนินการ' : 'Pending Orders', value: stats?.pending_orders || 0, icon: Clock, color: 'text-amber-600', bg: 'bg-amber-50' },
+    { label: language === 'la' ? 'ສິນຄ້າທັງໝົດ' : language === 'th' ? 'สินค้าทั้งหมด' : 'Total Products', value: stats?.total_products || 0, icon: Package, color: 'text-blue-600', bg: 'bg-blue-50' },
+    { label: language === 'la' ? 'ຈັດສົ່ງມື້ນີ້' : language === 'th' ? 'จัดส่งวันนี้' : 'Shipped Today', value: stats?.shipped_today || 0, icon: Truck, color: 'text-emerald-600', bg: 'bg-emerald-50' },
   ];
 
   return (
