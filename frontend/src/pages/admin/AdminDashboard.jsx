@@ -15,6 +15,7 @@ function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [empPeriod, setEmpPeriod] = useState('all');
   const [empYear, setEmpYear] = useState('all');
+  const [kpiPeriod, setKpiPeriod] = useState('all');
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -73,8 +74,6 @@ function AdminDashboard() {
       </AutoTranslate>
     );
   }
-
-  const [kpiPeriod, setKpiPeriod] = useState('all');
 
   const ordersList = stats?.orders_list || [];
   const filteredOrders = kpiPeriod === 'all'
