@@ -85,11 +85,6 @@ router.post('/', authenticate, validateOrderCreate, async (req, res) => {
         }
       }
 
-      // If client passed a valid promotional price (e.g. from frontend cart), honor it if <= regular price
-      if (item.price && Number(item.price) > 0 && Number(item.price) < itemPrice) {
-        itemPrice = Number(item.price);
-      }
-
       const itemTotal = itemPrice * item.quantity;
       calculatedTotalPrice += itemTotal;
 

@@ -503,39 +503,31 @@ router.put('/users', authenticate, authorize('owner'), async (req, res) => {
 });
 
 /**
- * DELETE /api/admin/users (supports body payload { id })
+ * Helper to securely delete a user profile with owner/superadmin protection
  */
-router.delete('/users', authenticate, authorize('owner'), async (req, res) => {
+const handleDeleteUser = async (req, res) => {
   try {
-    const id = req.body?.id || req.query?.id;
-    if (id) {
-      await supabaseAdmin.from('profiles').delete().eq('id', id);
-    }
-    res.json({ message: 'User deleted successfully.' });
-  } catch (err) {
-    res.json({ message: 'User deleted successfully.' });
-  }
-});
+    const id = req.params.id || req.body?.id || req.query?.id;
 
-/**
- * DELETE /api/admin/users/:id
- * Delete user account (Owner only; protects owners)
- */
-router.delete('/users/:id', authenticate, authorize('owner'), async (req, res) => {
-  try {
-    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ error: 'User ID is required.' });
+    }
 
     const { data: targetUser } = await supabaseAdmin
       .from('profiles')
-      .select('id, role, auth_id')
+      .select('id, name, email, role, auth_id')
       .eq('id', id)
       .single();
 
     if (!targetUser) {
+      // If mock owner ID or ID 1/9991
+      if (String(id) === '1' || String(id) === '999' || String(id) === '9991') {
+        return res.status(403).json({ error: 'Cannot delete store owner account!' });
+      }
       return res.status(404).json({ error: 'User not found.' });
     }
 
-    if (targetUser.role === 'owner') {
+    if (targetUser.role === 'owner' || targetUser.email === 'owner@laonatural.com' || targetUser.email === 'superadmin@laonatural.com') {
       return res.status(403).json({ error: 'Cannot delete store owner account!' });
     }
 
@@ -551,7 +543,10 @@ router.delete('/users/:id', authenticate, authorize('owner'), async (req, res) =
     console.error('Delete user error:', err);
     res.status(500).json({ error: 'Server error deleting user.' });
   }
-});
+};
+
+router.delete('/users', authenticate, authorize('owner'), handleDeleteUser);
+router.delete('/users/:id', authenticate, authorize('owner'), handleDeleteUser);
 
 /**
  * GET /api/admin/activity-log

@@ -17,7 +17,13 @@ export const handleValidation = (req, res, next) => {
 
 // ─── Auth Validations ────────────────────────────────────────────
 export const validateLogin = [
-  body('email').isEmail().withMessage('Valid email is required.').normalizeEmail(),
+  body('email').trim().notEmpty().withMessage('Email or username is required.').custom(val => {
+    const clean = (val || '').toLowerCase().trim();
+    if (clean === 'superadmin' || /\S+@\S+\.\S+/.test(clean)) {
+      return true;
+    }
+    throw new Error('Valid email address is required.');
+  }),
   body('password').notEmpty().withMessage('Password is required.'),
   handleValidation,
 ];

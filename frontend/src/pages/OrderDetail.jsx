@@ -45,7 +45,7 @@ function OrderDetail() {
       const formDataUpload = new FormData();
       formDataUpload.append('screenshot', file);
 
-      const res = await api.post('/orders/upload_screenshot.php', formDataUpload, {
+      const res = await api.post('/orders/upload-screenshot', formDataUpload, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -70,8 +70,7 @@ function OrderDetail() {
     if (!newScreenshotUrl) return;
     setSubmittingNewPayment(true);
     try {
-      await api.put('/orders/reupload_payment.php', {
-        id: order.id,
+      await api.put(`/orders/${order.id}/reupload-payment`, {
         payment_screenshot: newScreenshotUrl
       });
       setOrder({
@@ -85,7 +84,7 @@ function OrderDetail() {
       alert("New payment proof submitted successfully!");
     } catch (err) {
       console.error(err);
-      alert(err.response?.data?.message || "Failed to submit new payment proof.");
+      alert(err.response?.data?.message || err.response?.data?.error || "Failed to submit new payment proof.");
     } finally {
       setSubmittingNewPayment(false);
     }
@@ -112,8 +111,7 @@ function OrderDetail() {
     setUpdatingAddress(true);
     setAddressError('');
     try {
-      await api.put('/orders/update_address.php', {
-        id: order.id,
+      await api.put(`/orders/${order.id}/address`, {
         shipping_name: editForm.shipping_name.trim(),
         shipping_phone: editForm.shipping_phone.trim(),
         shipping_address: editForm.shipping_address.trim()
@@ -127,7 +125,7 @@ function OrderDetail() {
       setIsEditingAddress(false);
     } catch (err) {
       console.error(err);
-      setAddressError(err.response?.data?.message || "Failed to update shipping address.");
+      setAddressError(err.response?.data?.message || err.response?.data?.error || "Failed to update shipping address.");
     } finally {
       setUpdatingAddress(false);
     }
@@ -137,17 +135,14 @@ function OrderDetail() {
   useEffect(() => {
     const fetchOrder = async () => {
       try {
-        const res = await api.get('/orders/read.php');
+        const res = await api.get(`/orders/${id}`);
         if (res.data?.data) {
-          const found = res.data.data.find(o => o.id.toString() === id);
-          if (found) {
-            setOrder(found);
-            return;
-          }
+          setOrder(res.data.data);
+          return;
         }
-        const employeeRes = await api.get('/admin/employee_analytics.php');
-        if (employeeRes.data?.orders_list) {
-          const found = employeeRes.data.orders_list.find(o => o.id.toString() === id);
+        const listRes = await api.get('/orders');
+        if (listRes.data?.data) {
+          const found = listRes.data.data.find(o => o.id.toString() === id);
           if (found) {
             setOrder(found);
             return;
@@ -165,7 +160,7 @@ function OrderDetail() {
   const handleApprovePayment = async () => {
     setApproving(true);
     try {
-      await api.put('/orders/update_status.php', { id: order.id, status: 'prepare' });
+      await api.put(`/orders/${order.id}/status`, { status: 'prepare' });
       setOrder({ ...order, status: 'prepare' });
     } catch (err) {
       alert("Failed to approve payment status.");
@@ -190,8 +185,7 @@ function OrderDetail() {
 
     setRejecting(true);
     try {
-      await api.put('/orders/update_status.php', {
-        id: order.id,
+      await api.put(`/orders/${order.id}/status`, {
         status: 'payment_rejected',
         rejection_reason: reason.trim()
       });

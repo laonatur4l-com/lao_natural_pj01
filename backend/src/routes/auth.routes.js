@@ -49,22 +49,18 @@ router.post('/login', validateLogin, async (req, res) => {
       }
     }
 
-    if (isDemoConfig || mockUsers[cleanEmail]) {
-      const user = mockUsers[cleanEmail] || {
-        id: Date.now(),
-        name: cleanEmail.split('@')[0],
-        email: cleanEmail,
-        role: 'user',
-        address: 'Vientiane Capital',
-        phone: '020 5555 0000'
-      };
-
-      return res.json({
-        message: 'Successful login.',
-        jwt: `mock-jwt-token-${user.role}`,
-        refreshToken: `mock-refresh-token-${user.role}`,
-        user,
-      });
+    if (mockUsers[cleanEmail]) {
+      if (password === 'password123' || password === '123456' || password === '@$#12131415Lao') {
+        const user = mockUsers[cleanEmail];
+        return res.json({
+          message: 'Successful login.',
+          jwt: `mock-jwt-token-${user.role}`,
+          refreshToken: `mock-refresh-token-${user.role}`,
+          user,
+        });
+      } else {
+        return res.status(401).json({ error: 'Invalid email or password.' });
+      }
     }
 
     // Authenticate with Supabase Auth
