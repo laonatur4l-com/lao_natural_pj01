@@ -157,6 +157,20 @@ router.post('/', authenticate, authorize('owner', 'employee'), validateProduct, 
 
     const productId = id || `PROD_${Date.now()}`;
 
+    let validImportedBy = null;
+    if (req.user?.id) {
+      try {
+        const { data: prof } = await supabaseAdmin
+          .from('profiles')
+          .select('id')
+          .eq('id', req.user.id)
+          .single();
+        if (prof) validImportedBy = prof.id;
+      } catch (e) {
+        validImportedBy = null;
+      }
+    }
+
     const newProduct = {
       id: productId,
       name,
@@ -176,26 +190,26 @@ router.post('/', authenticate, authorize('owner', 'employee'), validateProduct, 
       stock: parseInt(stock, 10) || 0,
       image_url: image_url || null,
       ingredients: ingredients || null,
-      imported_by: req.user.id,
+      imported_by: validImportedBy,
     };
 
     const { data, error } = await supabaseAdmin
       .from('products')
-      .insert(newProduct)
+      .upsert(newProduct, { onConflict: 'id' })
       .select()
       .single();
 
     if (error) {
-      console.error('Create product error:', error);
-      return res.status(500).json({ error: 'Failed to create product.' });
+      console.error('Create/update product error:', error);
+      return res.status(500).json({ error: error.message || 'Failed to save product.' });
     }
 
-    await logActivity(supabaseAdmin, req.user.id, `Created product: ${name} (${productId})`);
+    await logActivity(supabaseAdmin, req.user.id, `Saved product: ${name} (${productId})`);
 
     res.status(201).json({ message: 'Product created successfully.', data });
   } catch (err) {
     console.error('Create product exception:', err);
-    res.status(500).json({ error: 'Server error creating product.' });
+    res.status(500).json({ error: err.message || 'Server error creating product.' });
   }
 });
 

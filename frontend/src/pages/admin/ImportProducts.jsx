@@ -177,16 +177,18 @@ function ImportProducts() {
           import_price_usd: 0
         };
         if (editingProduct && sizeEntry.isOriginal) {
-          await api.put('/products/update.php', { ...payload, old_id: editingProduct.id });
+          await api.put(`/products/${editingProduct.id}`, payload);
         } else {
-          await api.post('/admin/import_product.php', payload);
+          await api.post('/products', payload);
         }
       }
       setShowModal(false);
       resetForm();
       fetchProducts();
     } catch (err) {
-      alert(err.response?.data?.message || 'Error saving product');
+      console.error('Error saving product:', err);
+      const errMsg = err.response?.data?.error || err.response?.data?.message || err.message || 'Error saving product';
+      alert(errMsg);
     } finally {
       setSaving(false);
     }
