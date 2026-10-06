@@ -94,10 +94,10 @@ function EmployeeBanners() {
     if (!window.confirm(confirmMessage)) return;
 
     try {
-      await api.post('/banners/delete.php', { id });
+      await api.delete(`/banners/${id}`);
       await fetchBanners();
     } catch (err) {
-      alert("Failed to delete banner: " + (err.response?.data?.message || err.message));
+      alert("Failed to delete banner: " + (err.response?.data?.error || err.response?.data?.message || err.message));
     }
   };
 

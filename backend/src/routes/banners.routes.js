@@ -89,12 +89,15 @@ router.post('/upload', authenticate, authorize('owner', 'employee'), upload.sing
 });
 
 /**
- * DELETE /api/banners/:id
- * Delete banner (Staff/Owner)
+ * Universal delete banner handler
  */
-router.delete('/:id', authenticate, authorize('owner', 'employee'), async (req, res) => {
+const handleDeleteBanner = async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id || req.body?.id || req.query?.id;
+
+    if (!id) {
+      return res.status(400).json({ error: 'Banner ID is required.' });
+    }
 
     const { data: banner } = await supabaseAdmin
       .from('hero_banners')
@@ -118,6 +121,10 @@ router.delete('/:id', authenticate, authorize('owner', 'employee'), async (req, 
     console.error('Delete banner error:', err);
     res.status(500).json({ error: 'Server error deleting banner.' });
   }
-});
+};
+
+router.delete('/:id', authenticate, authorize('owner', 'employee'), handleDeleteBanner);
+router.delete('/', authenticate, authorize('owner', 'employee'), handleDeleteBanner);
+router.post('/delete', authenticate, authorize('owner', 'employee'), handleDeleteBanner);
 
 export default router;

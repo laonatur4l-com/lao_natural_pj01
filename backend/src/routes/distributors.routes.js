@@ -142,12 +142,15 @@ router.put('/:id', authenticate, authorize('owner', 'employee'), upload.single('
 });
 
 /**
- * DELETE /api/distributors/:id
- * Delete distributor (Staff/Owner)
+ * Universal delete distributor handler
  */
-router.delete('/:id', authenticate, authorize('owner', 'employee'), async (req, res) => {
+const handleDeleteDistributor = async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id || req.body?.id || req.query?.id;
+
+    if (!id) {
+      return res.status(400).json({ error: 'Distributor ID is required.' });
+    }
 
     const { data: distributor } = await supabaseAdmin
       .from('distributors')
@@ -171,6 +174,10 @@ router.delete('/:id', authenticate, authorize('owner', 'employee'), async (req, 
     console.error('Delete distributor error:', err);
     res.status(500).json({ error: 'Server error deleting distributor.' });
   }
-});
+};
+
+router.delete('/:id', authenticate, authorize('owner', 'employee'), handleDeleteDistributor);
+router.delete('/', authenticate, authorize('owner', 'employee'), handleDeleteDistributor);
+router.post('/delete', authenticate, authorize('owner', 'employee'), handleDeleteDistributor);
 
 export default router;

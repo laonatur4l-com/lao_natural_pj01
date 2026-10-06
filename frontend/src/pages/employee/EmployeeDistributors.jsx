@@ -142,10 +142,10 @@ function EmployeeDistributors() {
     if (!window.confirm("Are you sure you want to delete this collaborator?")) return;
 
     try {
-      await api.post('/distributors/delete.php', { id });
+      await api.delete(`/distributors/${id}`);
       await fetchDistributors();
     } catch (err) {
-      alert("Failed to delete collaborator: " + (err.response?.data?.message || err.message));
+      alert("Failed to delete collaborator: " + (err.response?.data?.error || err.response?.data?.message || err.message));
     }
   };
 
