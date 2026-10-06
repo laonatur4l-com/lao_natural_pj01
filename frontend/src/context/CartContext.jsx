@@ -144,6 +144,13 @@ export const CartProvider = ({ children }) => {
 
   const [exchangeRatesState, setExchangeRatesState] = useState(EXCHANGE_RATES);
 
+  const updateExchangeRates = (newRates) => {
+    if (newRates?.THB && newRates?.USD) {
+      setExchangeRates(newRates);
+      setExchangeRatesState({ ...newRates });
+    }
+  };
+
   const fetchExchangeRates = async () => {
     try {
       const res = await api.get('/exchange-rates?t=' + Date.now());
@@ -266,7 +273,7 @@ export const CartProvider = ({ children }) => {
   const count = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, updateQuantity, clearCart, total, totalThb, totalUsd, count, getItemSubtotal, exchangeRates: exchangeRatesState, refreshExchangeRates: fetchExchangeRates }}>
+    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, updateQuantity, clearCart, total, totalThb, totalUsd, count, getItemSubtotal, exchangeRates: exchangeRatesState, refreshExchangeRates: fetchExchangeRates, updateExchangeRates }}>
       {children}
     </CartContext.Provider>
   );

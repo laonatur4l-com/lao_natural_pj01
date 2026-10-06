@@ -70,7 +70,7 @@ const getStoredExchangeRates = () => {
       if (parsed?.THB && parsed?.USD) return parsed;
     }
   } catch (e) {}
-  return { THB: 650, USD: 20000 };
+  return { THB: 680, USD: 21800 };
 };
 
 export let EXCHANGE_RATES = getStoredExchangeRates();
@@ -101,17 +101,17 @@ export const setExchangeRates = (newRates) => {
 
 /**
  * Gets THB price by converting from LAK using the current exchange rate.
- * Accepts optional rateOverride (e.g. 670) or defaults to global EXCHANGE_RATES.THB.
+ * Accepts optional rateOverride (e.g. 680) or defaults to global EXCHANGE_RATES.THB.
  * 
  * @param {number|string} priceLak - The price in LAK
- * @param {number|string} [customRate] - Optional custom exchange rate (e.g. 670)
+ * @param {number|string} [customRate] - Optional custom exchange rate (e.g. 680)
  */
 export const getThbPrice = (priceLak, customRate) => {
   const lak = parseFloat(priceLak || 0);
   const rate = (customRate && !isNaN(parseFloat(customRate)) && parseFloat(customRate) > 10) 
     ? parseFloat(customRate) 
     : EXCHANGE_RATES.THB;
-  return lak > 0 ? (lak / (rate || 700)) : 0;
+  return lak > 0 ? (lak / (rate || 680)) : 0;
 };
 
 /**
@@ -126,5 +126,5 @@ export const getUsdPrice = (priceLak, customRate) => {
   const rate = (customRate && !isNaN(parseFloat(customRate)) && parseFloat(customRate) > 1000) 
     ? parseFloat(customRate) 
     : EXCHANGE_RATES.USD;
-  return lak > 0 ? (lak / (rate || 22000)) : 0;
+  return lak > 0 ? (lak / (rate || 21800)) : 0;
 };

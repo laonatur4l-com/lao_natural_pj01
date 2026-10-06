@@ -11,13 +11,13 @@ import { useCart } from '../../context/CartContext';
 
 function EmployeeProducts() {
   const { user } = useAuth();
-  const { exchangeRates, refreshExchangeRates } = useCart();
+  const { exchangeRates, refreshExchangeRates, updateExchangeRates } = useCart();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [showRateModal, setShowRateModal] = useState(false);
-  const [ratesForm, setRatesForm] = useState({ THB: 650, USD: 20000 });
+  const [ratesForm, setRatesForm] = useState({ THB: 680, USD: 21800 });
   const [savingRates, setSavingRates] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -27,18 +27,19 @@ function EmployeeProducts() {
       const res = await api.get('/exchange-rates?t=' + Date.now());
       if (res.data?.rates) {
         setRatesForm({
-          THB: res.data.rates.THB || 650,
-          USD: res.data.rates.USD || 20000
+          THB: res.data.rates.THB || 680,
+          USD: res.data.rates.USD || 21800
         });
-        if (refreshExchangeRates) refreshExchangeRates();
+        if (updateExchangeRates) updateExchangeRates(res.data.rates);
+        else if (refreshExchangeRates) refreshExchangeRates();
       }
     } catch (err) {}
   };
 
   const handleOpenRateModal = () => {
     setRatesForm({
-      THB: exchangeRates?.THB || ratesForm.THB || 700,
-      USD: exchangeRates?.USD || ratesForm.USD || 22000
+      THB: exchangeRates?.THB || ratesForm.THB || 680,
+      USD: exchangeRates?.USD || ratesForm.USD || 21800
     });
     setShowRateModal(true);
   };
@@ -51,8 +52,9 @@ function EmployeeProducts() {
         THB: parseFloat(String(ratesForm.THB).replace(/,/g, '')),
         USD: parseFloat(String(ratesForm.USD).replace(/,/g, ''))
       };
-      await api.post('/exchange-rates', { rates: payloadRates });
-      await loadRates();
+      const res = await api.post('/exchange-rates', { rates: payloadRates });
+      const savedRates = res.data?.rates || payloadRates;
+      if (updateExchangeRates) updateExchangeRates(savedRates);
       if (refreshExchangeRates) refreshExchangeRates();
       alert('Exchange rates updated successfully!');
       setShowRateModal(false);
@@ -256,8 +258,8 @@ function EmployeeProducts() {
           <div className="text-xs">
             <span className="font-semibold text-gray-500 block text-[11px] uppercase tracking-wider">Exchange Rates:</span>
             <div className="flex gap-3 text-dark font-bold font-mono text-sm mt-0.5">
-              <span>🇹🇭 1 THB = ₭{Number(exchangeRates?.THB || 650).toLocaleString()}</span>
-              <span>🇺🇸 1 USD = ₭{Number(exchangeRates?.USD || 20000).toLocaleString()}</span>
+              <span>🇹🇭 1 THB = ₭{Number(exchangeRates?.THB || 680).toLocaleString()}</span>
+              <span>🇺🇸 1 USD = ₭{Number(exchangeRates?.USD || 21800).toLocaleString()}</span>
             </div>
           </div>
           <button

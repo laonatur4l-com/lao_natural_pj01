@@ -10,19 +10,19 @@ import AutoTranslate from '../../components/AutoTranslate';
 
 function EmployeeDashboard() {
   const { user } = useAuth();
-  const { exchangeRates, refreshExchangeRates } = useCart();
+  const { exchangeRates, refreshExchangeRates, updateExchangeRates } = useCart();
   const { t, language } = useLanguage();
   const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showRateModal, setShowRateModal] = useState(false);
-  const [ratesForm, setRatesForm] = useState({ THB: 700, USD: 22000 });
+  const [ratesForm, setRatesForm] = useState({ THB: 680, USD: 21800 });
   const [savingRates, setSavingRates] = useState(false);
 
   const handleOpenRateModal = () => {
     setRatesForm({
-      THB: exchangeRates?.THB || ratesForm.THB || 700,
-      USD: exchangeRates?.USD || ratesForm.USD || 22000
+      THB: exchangeRates?.THB || ratesForm.THB || 680,
+      USD: exchangeRates?.USD || ratesForm.USD || 21800
     });
     setShowRateModal(true);
   };
@@ -35,7 +35,9 @@ function EmployeeDashboard() {
         THB: parseFloat(String(ratesForm.THB).replace(/,/g, '')),
         USD: parseFloat(String(ratesForm.USD).replace(/,/g, ''))
       };
-      await api.post('/exchange-rates', { rates: payloadRates });
+      const res = await api.post('/exchange-rates', { rates: payloadRates });
+      const savedRates = res.data?.rates || payloadRates;
+      if (updateExchangeRates) updateExchangeRates(savedRates);
       if (refreshExchangeRates) refreshExchangeRates();
       alert('Exchange rates updated successfully!');
       setShowRateModal(false);
@@ -108,8 +110,8 @@ function EmployeeDashboard() {
           <div className="text-xs">
             <span className="font-semibold text-gray-500 block text-[11px] uppercase tracking-wider">Exchange Rates:</span>
             <div className="flex gap-3 text-dark font-bold font-mono text-sm mt-0.5">
-              <span>🇹🇭 1 THB = ₭{Number(exchangeRates?.THB || 700).toLocaleString()}</span>
-              <span>🇺🇸 1 USD = ₭{Number(exchangeRates?.USD || 22000).toLocaleString()}</span>
+              <span>🇹🇭 1 THB = ₭{Number(exchangeRates?.THB || 680).toLocaleString()}</span>
+              <span>🇺🇸 1 USD = ₭{Number(exchangeRates?.USD || 21800).toLocaleString()}</span>
             </div>
           </div>
           <button

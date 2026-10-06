@@ -9,8 +9,8 @@ const router = express.Router();
 
 // Fallback in-memory exchange rates store
 let currentRates = {
-  THB: 700.0,
-  USD: 22000.0,
+  THB: 680.0,
+  USD: 21800.0,
 };
 
 /**
