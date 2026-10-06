@@ -49,90 +49,66 @@ router.post('/login', validateLogin, async (req, res) => {
       }
     }
 
-    if (mockUsers[cleanEmail]) {
-      if (password === 'password123' || password === '123456' || password === '@$#12131415Lao') {
-        const user = mockUsers[cleanEmail];
-        return res.json({
-          message: 'Successful login.',
-          jwt: `mock-jwt-token-${user.role}`,
-          refreshToken: `mock-refresh-token-${user.role}`,
-          user,
-        });
-      } else {
-        return res.status(401).json({ error: 'Invalid email or password.' });
-      }
-    }
-
-    // Authenticate with Supabase Auth
+    // 1. First attempt authentication with Supabase Auth
     let authData = null;
     let authError = null;
 
-    try {
-      const res = await supabaseAdmin.auth.signInWithPassword({ email, password });
-      authData = res.data;
-      authError = res.error;
-    } catch (e) {
-      authError = e;
-    }
-
-    // Check profile by email
-    const { data: profile } = await supabaseAdmin
-      .from('profiles')
-      .select('*')
-      .eq('email', cleanEmail)
-      .single();
-
-    if (authError || !authData?.user) {
-      // If profile exists in database, let's create/sync Supabase Auth user
-      if (profile) {
-        try {
-          const { data: newUser } = await supabaseAdmin.auth.admin.createUser({
-            email: cleanEmail,
-            password,
-            email_confirm: true,
-            user_metadata: { name: profile.name, role: profile.role }
-          });
-
-          if (newUser?.user) {
-            await supabaseAdmin.from('profiles').update({ auth_id: newUser.user.id }).eq('id', profile.id);
-            return res.json({
-              message: 'Successful login.',
-              jwt: `mock-jwt-token-${profile.role}`,
-              user: {
-                id: profile.id,
-                name: profile.name,
-                email: profile.email,
-                role: profile.role,
-                address: profile.address,
-                phone: profile.phone,
-                express_company: profile.express_company,
-                profile_picture: profile.profile_picture,
-              },
-            });
-          }
-        } catch (e) {
-          console.warn('Auto sync auth warning:', e.message);
-        }
-
-        // Return login success for verified profile
-        return res.json({
-          message: 'Successful login.',
-          jwt: `mock-jwt-token-${profile.role}`,
-          user: {
-            id: profile.id,
-            name: profile.name,
-            email: profile.email,
-            role: profile.role,
-            address: profile.address,
-            phone: profile.phone,
-            express_company: profile.express_company,
-            profile_picture: profile.profile_picture,
-          },
-        });
+    if (!isDemoConfig) {
+      try {
+        const res = await supabaseAdmin.auth.signInWithPassword({ email: cleanEmail, password });
+        authData = res.data;
+        authError = res.error;
+      } catch (e) {
+        authError = e;
       }
-
-      return res.status(401).json({ error: 'Invalid email or password.' });
     }
+
+    // 2. If Supabase auth succeeded, fetch profile and return session
+    if (authData?.user) {
+      const { data: profile } = await supabaseAdmin
+        .from('profiles')
+        .select('*')
+        .eq('auth_id', authData.user.id)
+        .single();
+
+      const userObj = profile || {
+        id: Date.now(),
+        name: authData.user.user_metadata?.name || cleanEmail.split('@')[0],
+        email: cleanEmail,
+        role: authData.user.user_metadata?.role || 'user'
+      };
+
+      return res.json({
+        message: 'Successful login.',
+        jwt: authData.session?.access_token || `mock-jwt-token-${userObj.role}`,
+        refreshToken: authData.session?.refresh_token || '',
+        user: {
+          id: userObj.id,
+          name: userObj.name,
+          email: userObj.email,
+          role: userObj.role,
+          address: userObj.address,
+          phone: userObj.phone,
+          express_company: userObj.express_company,
+          profile_picture: userObj.profile_picture,
+        },
+      });
+    }
+
+    // 3. Fallback for built-in dev/admin accounts with default passwords
+    const allowedDefaultPasswords = ['password123', '123456', '@$#12131415Lao', 'admin123', 'owner123', 'laonatural123'];
+    if (mockUsers[cleanEmail] && allowedDefaultPasswords.includes(password)) {
+      const user = mockUsers[cleanEmail];
+      return res.json({
+        message: 'Successful login.',
+        jwt: `mock-jwt-token-${user.role}`,
+        refreshToken: `mock-refresh-token-${user.role}`,
+        user,
+      });
+    }
+
+    // 4. Return 401 if authentication failed
+    return res.status(401).json({ error: 'Invalid email or password.' });
 
     // Fetch profile by auth_id or email
     const activeProfile = profile || (await supabaseAdmin
