@@ -115,6 +115,7 @@ function EmployeeDistributors() {
       data.append('phone', formData.phone);
 
       if (selectedFile) {
+        data.append('logo', selectedFile);
         data.append('image', selectedFile);
       }
 
@@ -132,7 +133,7 @@ function EmployeeDistributors() {
       setShowModal(false);
       await fetchDistributors();
     } catch (err) {
-      setError(err.response?.data?.message || err.message || "Failed to save details");
+      setError(err.response?.data?.error || err.response?.data?.message || err.message || "Failed to save details");
     } finally {
       setSaving(false);
     }
