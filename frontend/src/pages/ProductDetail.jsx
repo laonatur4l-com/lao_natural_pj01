@@ -24,7 +24,7 @@ function ProductDetail() {
 
     const fetchRelated = async (categoryName, currentPrdId) => {
       try {
-        const res = await api.get(`/products/read.php?category=${categoryName}`);
+        const res = await api.get(`/products?category=${categoryName}`);
         let list = [];
         if (res.data && res.data.data) {
           list = res.data.data.filter(p => String(p.id) !== String(currentPrdId));
@@ -32,7 +32,7 @@ function ProductDetail() {
         
         // If there are less than 4 related items, backfill with general products
         if (list.length < 4) {
-          const allRes = await api.get('/products/read.php');
+          const allRes = await api.get('/products');
           if (allRes.data && allRes.data.data) {
             const fallbackList = allRes.data.data.filter(
               p => String(p.id) !== String(currentPrdId) && !list.some(existing => String(existing.id) === String(p.id))

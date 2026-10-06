@@ -21,7 +21,7 @@ function Reports() {
 
   const fetchOrders = async () => {
     try {
-      const res = await api.get('/orders/read.php');
+      const res = await api.get('/orders');
       if (res.data?.data) {
         setOrders(res.data.data);
       }

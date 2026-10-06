@@ -146,7 +146,7 @@ export const CartProvider = ({ children }) => {
 
   const fetchExchangeRates = async () => {
     try {
-      const res = await api.get('/exchange_rates/read.php?t=' + Date.now());
+      const res = await api.get('/exchange-rates?t=' + Date.now());
       if (res.data?.rates) {
         setExchangeRates(res.data.rates);
         setExchangeRatesState({ ...res.data.rates });

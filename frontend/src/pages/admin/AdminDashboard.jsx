@@ -20,7 +20,7 @@ function AdminDashboard() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await api.get('/admin/analytics.php');
+        const res = await api.get('/admin/analytics');
         if (res.data && res.data.data) {
           setStats(res.data.data);
         }

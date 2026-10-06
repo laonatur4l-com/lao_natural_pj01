@@ -19,7 +19,7 @@ function CategoryManagement() {
 
   const fetchCategories = async () => {
     try {
-      const res = await api.get('/categories/read.php');
+      const res = await api.get('/categories');
       if (res.data?.data) {
         setCategories(res.data.data);
       }
@@ -37,9 +37,9 @@ function CategoryManagement() {
     setSaving(true);
     try {
       if (editingCategory) {
-        await api.put('/categories/update.php', { id: editingCategory.id, name: categoryName });
+        await api.put('/categories', { id: editingCategory.id, name: categoryName });
       } else {
-        await api.post('/categories/create.php', { name: categoryName });
+        await api.post('/categories', { name: categoryName });
       }
       setShowModal(false);
       setCategoryName('');
@@ -62,7 +62,7 @@ function CategoryManagement() {
     if (!window.confirm("Are you sure you want to delete this category? Products using this category will still have the category name, but it won't appear in the active dropdowns.")) return;
 
     try {
-      await api.delete('/categories/delete.php', { data: { id } });
+      await api.delete('/categories', { data: { id } });
       fetchCategories();
     } catch (err) {
       alert("Error deleting category: " + (err.response?.data?.message || err.message));

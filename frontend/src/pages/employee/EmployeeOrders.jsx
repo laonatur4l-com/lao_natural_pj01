@@ -15,7 +15,7 @@ function EmployeeOrders() {
 
   const fetchOrders = async () => {
     try {
-      const res = await api.get('/orders/read.php');
+      const res = await api.get('/orders');
       if (res.data?.data) setOrders(res.data.data);
     } catch (err) {
       console.error("Failed to load orders", err);
@@ -38,7 +38,7 @@ function EmployeeOrders() {
       rejectionReason = rejectionReason.trim();
     }
     try {
-      await api.put('/orders/update_status.php', { id, status: newStatus, rejection_reason: rejectionReason });
+      await api.put('/orders/status', { id, status: newStatus, rejection_reason: rejectionReason });
       setOrders(orders.map(o => o.id === id ? { ...o, status: newStatus, rejection_reason: rejectionReason } : o));
     } catch (err) {
       alert("Failed to update status");

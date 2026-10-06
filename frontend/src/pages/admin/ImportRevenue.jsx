@@ -16,7 +16,7 @@ function ImportRevenue() {
 
   const fetchImports = async () => {
     try {
-      const res = await api.get('/admin/read_product_imports.php');
+      const res = await api.get('/admin/product-imports');
       if (res.data?.data) {
         setImports(res.data.data);
       }

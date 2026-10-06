@@ -60,7 +60,7 @@ function Checkout() {
       // Pre-fill from user profile
       setShippingForm({ name: user.name || '', phone: user.phone || '', address: user.address || '' });
       // Also fetch fresh profile data
-      api.get('/user/profile.php').then(res => {
+      api.get('/user/profile').then(res => {
         if (res.data?.data) {
           const prof = res.data.data;
           setShippingForm({
@@ -102,7 +102,7 @@ function Checkout() {
         const formDataUpload = new FormData();
         formDataUpload.append('screenshot', file);
 
-        const res = await api.post('/orders/upload_screenshot.php', formDataUpload, {
+        const res = await api.post('/orders/upload-screenshot', formDataUpload, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
@@ -168,7 +168,7 @@ function Checkout() {
         };
       });
 
-      await api.post('/orders/create.php', { 
+      await api.post('/orders', { 
         items,
         shipping_name: shippingForm.name,
         shipping_phone: shippingForm.phone,

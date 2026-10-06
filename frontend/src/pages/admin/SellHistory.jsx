@@ -19,7 +19,7 @@ function SellHistory() {
 
   const fetchOrders = async () => {
     try {
-      const res = await api.get('/orders/read.php');
+      const res = await api.get('/orders');
       if (res.data?.data) {
         setOrders(res.data.data);
       }
@@ -239,7 +239,7 @@ function SellHistory() {
                               <button
                                 onClick={async () => {
                                   try {
-                                    await api.put('/orders/update_status.php', { id: selectedOrder.id, status: 'prepare' });
+                                    await api.put('/orders/status', { id: selectedOrder.id, status: 'prepare' });
                                     selectedOrder.status = 'prepare';
                                     setOrders(orders.map(o => o.id === selectedOrder.id ? { ...o, status: 'prepare' } : o));
                                     alert("Payment approved successfully!");
@@ -276,7 +276,7 @@ function SellHistory() {
                                       return;
                                     }
                                     try {
-                                      await api.put('/orders/update_status.php', { 
+                                      await api.put('/orders/status', { 
                                         id: selectedOrder.id, 
                                         status: 'payment_rejected',
                                         rejection_reason: rejectionReason.trim()

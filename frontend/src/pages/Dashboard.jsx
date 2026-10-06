@@ -29,9 +29,9 @@ function Dashboard() {
     const fetchData = async () => {
       try {
         const [ordersRes, profileRes, popularRes] = await Promise.all([
-          api.get('/orders/read.php'),
-          api.get('/user/profile.php').catch(() => ({ data: { data: null } })),
-          api.get('/products/read_popular.php').catch(() => ({ data: { data: [] } }))
+          api.get('/orders'),
+          api.get('/user/profile').catch(() => ({ data: { data: null } })),
+          api.get('/products/popular').catch(() => ({ data: { data: [] } }))
         ]);
         if (ordersRes.data?.data) setOrders(ordersRes.data.data);
         if (profileRes.data?.data) {
@@ -52,7 +52,7 @@ function Dashboard() {
   const handleUpdateAccount = async (e) => {
     e.preventDefault();
     try {
-      await api.put('/user/profile.php', accountForm);
+      await api.put('/user/profile', accountForm);
       setAccountMsg({ 
         text: language === 'la' ? 'ອັບເດດຂໍ້ມູນບັນຊີສຳເລັດແລ້ວ' : language === 'th' ? 'อัปเดตข้อมูลบัญชีสำเร็จแล้ว' : 'Account updated successfully', 
         type: 'success' 

@@ -34,7 +34,7 @@ function Home() {
   useEffect(() => {
     const fetchPopular = async () => {
       try {
-        const res = await api.get('/products/read_popular.php');
+        const res = await api.get('/products/popular');
         if (res.data?.data) {
           setPopularProducts(res.data.data.slice(0, 4)); // Get top 4 for landing layout
         }
@@ -47,7 +47,7 @@ function Home() {
     
     const fetchBanners = async () => {
       try {
-        const res = await api.get('/banners/read.php?type=hero');
+        const res = await api.get('/banners?type=hero');
         if (res.data?.data && res.data.data.length > 0) {
           setBanners(res.data.data.map(b => b.image_url));
         }
@@ -58,7 +58,7 @@ function Home() {
 
     const fetchClientLogos = async () => {
       try {
-        const res = await api.get('/banners/read.php?type=client');
+        const res = await api.get('/banners?type=client');
         if (res.data?.data && res.data.data.length > 0) {
           setClientLogos(res.data.data.map(b => ({ src: b.image_url, name: 'Client' })));
         }
@@ -69,7 +69,7 @@ function Home() {
 
     const fetchDistributors = async () => {
       try {
-        const res = await api.get('/distributors/read.php');
+        const res = await api.get('/distributors');
         if (res.data?.data) {
           setDistributors(res.data.data);
         }

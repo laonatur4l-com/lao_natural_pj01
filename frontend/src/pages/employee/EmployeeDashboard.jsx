@@ -35,7 +35,7 @@ function EmployeeDashboard() {
         THB: parseFloat(String(ratesForm.THB).replace(/,/g, '')),
         USD: parseFloat(String(ratesForm.USD).replace(/,/g, ''))
       };
-      await api.post('/exchange_rates/update.php', { rates: payloadRates });
+      await api.post('/exchange-rates', { rates: payloadRates });
       if (refreshExchangeRates) refreshExchangeRates();
       alert('Exchange rates updated successfully!');
       setShowRateModal(false);
@@ -49,7 +49,7 @@ function EmployeeDashboard() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await api.get('/admin/employee_analytics.php');
+        const res = await api.get('/admin/employee-analytics');
         if (res.data?.data) setStats(res.data.data);
       } catch (err) {
         console.error("Failed to load stats", err);

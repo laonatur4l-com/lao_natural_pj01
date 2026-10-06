@@ -24,7 +24,7 @@ function EmployeeBanners() {
   const fetchBanners = async () => {
     setLoading(true);
     try {
-      const res = await api.get(`/banners/read.php?type=${activeTab}`);
+      const res = await api.get(`/banners?type=${activeTab}`);
       if (res.data?.data) {
         setBanners(res.data.data);
       }
@@ -67,7 +67,7 @@ function EmployeeBanners() {
       uploadForm.append('image', file);
       uploadForm.append('type', activeTab);
 
-      const res = await api.post('/banners/upload.php', uploadForm, {
+      const res = await api.post('/banners/upload', uploadForm, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }

@@ -34,7 +34,7 @@ function EmployeeDistributors() {
   const fetchDistributors = async () => {
     setLoading(true);
     try {
-      const res = await api.get('/distributors/read.php');
+      const res = await api.get('/distributors');
       if (res.data?.data) {
         setDistributors(res.data.data);
       }
@@ -120,11 +120,11 @@ function EmployeeDistributors() {
 
       if (editingItem) {
         data.append('id', editingItem.id);
-        await api.post('/distributors/update.php', data, {
+        await api.post('/distributors', data, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
       } else {
-        await api.post('/distributors/create.php', data, {
+        await api.post('/distributors', data, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
       }

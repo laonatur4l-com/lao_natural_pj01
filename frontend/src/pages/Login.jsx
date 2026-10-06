@@ -34,7 +34,7 @@ function Login() {
 
     try {
       if (isLogin) {
-        const res = await api.post('/auth/login.php', { email: formData.email, password: formData.password });
+        const res = await api.post('/auth/login', { email: formData.email, password: formData.password });
         if (res.data && res.data.jwt) {
           login(res.data.user, res.data.jwt);
           
@@ -52,7 +52,7 @@ function Login() {
           }
         }
       } else {
-        const regRes = await api.post('/auth/register.php', formData);
+        const regRes = await api.post('/auth/register', formData);
         if (regRes.data?.jwt && regRes.data?.user) {
           login(regRes.data.user, regRes.data.jwt);
           navigate('/dashboard', { replace: true });

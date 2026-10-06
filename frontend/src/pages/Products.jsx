@@ -20,7 +20,7 @@ function Products() {
       setLoading(true);
       try {
         const query = categoryFilter ? `?category=${categoryFilter}` : '';
-        const res = await api.get(`/products/read.php${query}`);
+        const res = await api.get(`/products${query}`);
         if(res.data && res.data.data) {
            setProducts(res.data.data);
         }
@@ -41,7 +41,7 @@ function Products() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await api.get('/categories/read.php');
+        const res = await api.get('/categories');
         if (res.data && res.data.data) {
           setCategories(res.data.data);
         }

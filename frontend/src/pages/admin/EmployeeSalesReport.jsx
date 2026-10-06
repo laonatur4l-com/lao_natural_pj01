@@ -22,7 +22,7 @@ function EmployeeSalesReport() {
   const fetchStats = async () => {
     setLoading(true);
     try {
-      const res = await api.get('/admin/analytics.php');
+      const res = await api.get('/admin/analytics');
       if (res.data?.data?.employee_sales) {
         setEmployeeSales(res.data.data.employee_sales);
       }

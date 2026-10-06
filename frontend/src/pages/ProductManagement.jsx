@@ -34,7 +34,7 @@ function ProductManagement() {
 
   const fetchCategories = async () => {
     try {
-      const res = await api.get('/categories/read.php');
+      const res = await api.get('/categories');
       if (res.data?.data) setCategories(res.data.data);
     } catch (err) {
       console.error("Failed to load categories", err);
@@ -43,7 +43,7 @@ function ProductManagement() {
 
   const fetchProducts = async () => {
     try {
-      const res = await api.get('/products/read.php');
+      const res = await api.get('/products');
       if (res.data && res.data.data) {
         setProducts(res.data.data);
       }
@@ -58,9 +58,9 @@ function ProductManagement() {
     e.preventDefault();
     try {
       if (editingProduct) {
-        await api.put('/products/update.php', { ...formData, id: editingProduct.id });
+        await api.put('/products', { ...formData, id: editingProduct.id });
       } else {
-        await api.post('/products/create.php', formData);
+        await api.post('/products', formData);
       }
       setShowModal(false);
       resetForm();
@@ -88,7 +88,7 @@ function ProductManagement() {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
       try {
-        await api.delete('/products/delete.php', { data: { id } });
+        await api.delete('/products', { data: { id } });
         fetchProducts();
       } catch (err) {
         alert("Error deleting product: " + (err.response?.data?.message || err.message));

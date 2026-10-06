@@ -19,7 +19,7 @@ function EmployeeDashboard() {
 
     const fetchOrders = async () => {
       try {
-        const res = await api.get('/orders/read.php');
+        const res = await api.get('/orders');
         if (res.data && res.data.data) {
           setOrders(res.data.data);
         }
@@ -34,7 +34,7 @@ function EmployeeDashboard() {
 
   const updateStatus = async (id, newStatus) => {
     try {
-      await api.put('/orders/update_status.php', { id, status: newStatus });
+      await api.put('/orders/status', { id, status: newStatus });
       setOrders(orders.map(o => o.id === id ? { ...o, status: newStatus } : o));
     } catch (err) {
       alert("Failed to update status");

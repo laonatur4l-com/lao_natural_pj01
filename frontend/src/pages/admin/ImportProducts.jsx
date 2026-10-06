@@ -20,7 +20,7 @@ function ImportProducts() {
 
   const loadRates = async () => {
     try {
-      const res = await api.get('/exchange_rates/read.php?t=' + Date.now());
+      const res = await api.get('/exchange-rates?t=' + Date.now());
       if (res.data?.rates) {
         setRatesForm({
           THB: res.data.rates.THB || 650,
@@ -47,7 +47,7 @@ function ImportProducts() {
         THB: parseFloat(String(ratesForm.THB).replace(/,/g, '')),
         USD: parseFloat(String(ratesForm.USD).replace(/,/g, ''))
       };
-      await api.post('/exchange_rates/update.php', { rates: payloadRates });
+      await api.post('/exchange-rates', { rates: payloadRates });
       await loadRates();
       if (refreshExchangeRates) refreshExchangeRates();
       alert('Exchange rates updated successfully!');
@@ -93,7 +93,7 @@ function ImportProducts() {
 
   const fetchProducts = async () => {
     try {
-      const res = await api.get('/products/read.php');
+      const res = await api.get('/products');
       if (res.data?.data) setProducts(res.data.data);
     } catch (err) {
       console.error("Failed to load products", err);
@@ -104,7 +104,7 @@ function ImportProducts() {
 
   const fetchCategories = async () => {
     try {
-      const res = await api.get('/categories/read.php');
+      const res = await api.get('/categories');
       if (res.data?.data) setCategories(res.data.data);
     } catch (err) {
       console.error("Failed to load categories", err);
@@ -127,7 +127,7 @@ function ImportProducts() {
       uploadForm.append('image', file);
 
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost/lao_natural_pj01/backend/api/products/upload_image.php', {
+      const res = await fetch('http://localhost/lao_natural_pj01/backend/api/products/upload-image', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
         body: uploadForm
@@ -254,7 +254,7 @@ function ImportProducts() {
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this product?')) return;
     try {
-      await api.delete('/products/delete.php', { data: { id } });
+      await api.delete('/products', { data: { id } });
       fetchProducts();
     } catch (err) {
       alert('Error deleting product: ' + (err.response?.data?.message || err.message));
@@ -281,7 +281,7 @@ function ImportProducts() {
     setHistoryLoading(true);
     setShowHistoryModal(true);
     try {
-      const res = await api.get(`/admin/read_product_imports.php?product_id=${id}`);
+      const res = await api.get(`/admin/product-imports?product_id=${id}`);
       if (res.data?.data) setImportHistory(res.data.data);
     } catch (err) {
       console.error("Failed to load history", err);

@@ -29,7 +29,7 @@ function UserManagement() {
   const fetchUsers = async () => {
     try {
       const params = filter !== 'all' ? `?role=${filter}` : '';
-      const res = await api.get(`/admin/users.php${params}`);
+      const res = await api.get(`/admin/users${params}`);
       if (res.data?.data) setUsers(res.data.data);
     } catch (err) {
       console.error("Failed to load users", err);
@@ -45,9 +45,9 @@ function UserManagement() {
       if (editingUser) {
         const payload = { ...formData, id: editingUser.id };
         if (!payload.password) delete payload.password;
-        await api.put('/admin/users.php', payload);
+        await api.put('/admin/users', payload);
       } else {
-        await api.post('/admin/users.php', formData);
+        await api.post('/admin/users', formData);
       }
       setShowModal(false);
       resetForm();
@@ -77,7 +77,7 @@ function UserManagement() {
     data.append('image', e.target.files[0]);
 
     try {
-      const res = await api.post('/products/upload_image.php', data, {
+      const res = await api.post('/products/upload-image', data, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       if (res.data?.image_url) {
@@ -95,7 +95,7 @@ function UserManagement() {
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this user?')) return;
     try {
-      await api.delete('/admin/users.php', { data: { id } });
+      await api.delete('/admin/users', { data: { id } });
       fetchUsers();
     } catch (err) {
       alert('Error deleting user: ' + (err.response?.data?.message || err.message));

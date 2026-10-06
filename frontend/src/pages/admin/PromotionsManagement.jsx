@@ -35,8 +35,8 @@ function PromotionsManagement() {
     setLoading(true);
     try {
       const [promoRes, prodRes] = await Promise.all([
-        api.get('/promotions/read.php'),
-        api.get('/products/read.php')
+        api.get('/promotions'),
+        api.get('/products')
       ]);
       if (promoRes.data?.data) {
         setPromotions(promoRes.data.data);
@@ -129,9 +129,9 @@ function PromotionsManagement() {
     setSaving(true);
     try {
       if (editingPromo) {
-        await api.put('/promotions/update.php', { ...formData, id: editingPromo.id });
+        await api.put('/promotions', { ...formData, id: editingPromo.id });
       } else {
-        await api.post('/promotions/create.php', formData);
+        await api.post('/promotions', formData);
       }
       setShowModal(false);
       resetForm();
@@ -146,7 +146,7 @@ function PromotionsManagement() {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this promotion?")) return;
     try {
-      await api.delete('/promotions/delete.php', { data: { id } });
+      await api.delete('/promotions', { data: { id } });
       fetchData();
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to delete promotion');
@@ -156,7 +156,7 @@ function PromotionsManagement() {
   const handleToggleStatus = async (promo) => {
     const newStatus = promo.status === 'active' ? 'inactive' : 'active';
     try {
-      await api.put('/promotions/update.php', { ...promo, status: newStatus });
+      await api.put('/promotions', { ...promo, status: newStatus });
       fetchData();
     } catch (err) {
       alert('Failed to update status');

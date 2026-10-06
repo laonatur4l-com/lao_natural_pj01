@@ -290,9 +290,9 @@ router.put('/:id/status', authenticate, authorize('owner', 'employee'), handleUp
  * PUT /api/orders/:id/address
  * Update order shipping address
  */
-router.put('/:id/address', authenticate, validateOrderAddress, async (req, res) => {
+const handleUpdateAddress = async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id && req.params.id !== 'address' ? req.params.id : req.body.id;
     const { shipping_name, shipping_phone, shipping_address } = req.body;
 
     // Check order exists
@@ -330,7 +330,10 @@ router.put('/:id/address', authenticate, validateOrderAddress, async (req, res) 
     console.error('Update address exception:', err);
     res.status(500).json({ error: 'Server error updating shipping details.' });
   }
-});
+};
+
+router.put('/address', authenticate, validateOrderAddress, handleUpdateAddress);
+router.put('/:id/address', authenticate, validateOrderAddress, handleUpdateAddress);
 
 /**
  * POST /api/orders/upload-screenshot
@@ -360,9 +363,9 @@ router.post('/upload-screenshot', authenticate, upload.single('screenshot'), asy
  * PUT /api/orders/:id/reupload-payment
  * Reupload payment slip screenshot for rejected/pending order
  */
-router.put('/:id/reupload-payment', authenticate, async (req, res) => {
+const handleReuploadPayment = async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id && req.params.id !== 'reupload-payment' ? req.params.id : req.body.id;
     const { payment_screenshot } = req.body;
 
     if (!payment_screenshot) {
@@ -409,6 +412,9 @@ router.put('/:id/reupload-payment', authenticate, async (req, res) => {
     console.error('Reupload payment error:', err);
     res.status(500).json({ error: 'Server error updating payment.' });
   }
-});
+};
+
+router.put('/reupload-payment', authenticate, handleReuploadPayment);
+router.put('/:id/reupload-payment', authenticate, handleReuploadPayment);
 
 export default router;

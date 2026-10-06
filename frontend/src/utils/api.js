@@ -14,7 +14,7 @@ const api = axios.create({
   },
 });
 
-// Interceptor to add Authorization JWT header & translate legacy PHP script paths to RESTful Express paths
+// Interceptor to add Authorization JWT header
 api.interceptors.request.use(config => {
   let token = localStorage.getItem('token');
   if (!token) {
@@ -31,104 +31,6 @@ api.interceptors.request.use(config => {
   }
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
-  }
-
-  // Seamless Legacy PHP Path Rewriter for Frontend Backwards Compatibility
-  if (config.url) {
-    let url = config.url;
-
-    // Remove query params for path matching, keep query params after transformation
-    const queryIdx = url.indexOf('?');
-    const queryString = queryIdx !== -1 ? url.substring(queryIdx) : '';
-    const cleanPath = queryIdx !== -1 ? url.substring(0, queryIdx) : url;
-
-    // Special handling for read_single.php with query parameter id
-    if (cleanPath === '/products/read_single.php') {
-      const params = new URLSearchParams(queryString);
-      const prodId = params.get('id');
-      if (prodId) {
-        config.url = `/products/${prodId}`;
-        return config;
-      }
-    }
-
-    // Helper to safely extract payload object
-    const getPayload = (data) => {
-      if (!data) return {};
-      if (typeof data === 'string') {
-        try { return JSON.parse(data); } catch { return {}; }
-      }
-      return data;
-    };
-
-    // Special handling for /orders/update_status.php -> /orders/:id/status
-    if (cleanPath === '/orders/update_status.php') {
-      const params = new URLSearchParams(queryString);
-      const payload = getPayload(config.data);
-      const orderId = params.get('id') || payload.id;
-      if (orderId) {
-        config.url = `/orders/${orderId}/status`;
-        return config;
-      }
-    }
-
-    // Special handling for /orders/update_address.php -> /orders/:id/address
-    if (cleanPath === '/orders/update_address.php') {
-      const params = new URLSearchParams(queryString);
-      const payload = getPayload(config.data);
-      const orderId = params.get('id') || payload.id;
-      if (orderId) {
-        config.url = `/orders/${orderId}/address`;
-        return config;
-      }
-    }
-
-    const pathRewrites = {
-      '/auth/login.php': '/auth/login',
-      '/auth/register.php': '/auth/register',
-      '/products/read.php': '/products',
-      '/products/read_popular.php': '/products/popular',
-      '/products/read_single.php': '/products',
-      '/products/create.php': '/products',
-      '/products/update.php': '/products',
-      '/products/delete.php': '/products',
-      '/products/upload_image.php': '/products/upload-image',
-      '/orders/create.php': '/orders',
-      '/orders/read.php': '/orders',
-      '/orders/update_status.php': '/orders/status',
-      '/orders/update_address.php': '/orders/address',
-      '/orders/upload_screenshot.php': '/orders/upload-screenshot',
-      '/orders/reupload_payment.php': '/orders/reupload-payment',
-      '/categories/read.php': '/categories',
-      '/categories/create.php': '/categories',
-      '/categories/update.php': '/categories',
-      '/categories/delete.php': '/categories',
-      '/banners/read.php': '/banners',
-      '/banners/upload.php': '/banners/upload',
-      '/banners/delete.php': '/banners',
-      '/distributors/read.php': '/distributors',
-      '/distributors/create.php': '/distributors',
-      '/distributors/update.php': '/distributors',
-      '/distributors/delete.php': '/distributors',
-      '/promotions/read.php': '/promotions',
-      '/promotions/create.php': '/promotions',
-      '/promotions/update.php': '/promotions',
-      '/promotions/delete.php': '/promotions',
-      '/exchange_rates/read.php': '/exchange-rates',
-      '/exchange_rates/update.php': '/exchange-rates',
-      '/admin/analytics.php': '/admin/analytics',
-      '/admin/employee_analytics.php': '/admin/employee-analytics',
-      '/admin/employees.php': '/admin/employees',
-      '/admin/users.php': '/admin/users',
-      '/admin/activity_log.php': '/admin/activity-log',
-      '/admin/import_product.php': '/admin/import-product',
-      '/admin/read_product_imports.php': '/admin/product-imports',
-      '/user/profile.php': '/user/profile',
-    };
-
-    if (pathRewrites[cleanPath]) {
-      config.url = pathRewrites[cleanPath] + queryString;
-    }
   }
 
   return config;

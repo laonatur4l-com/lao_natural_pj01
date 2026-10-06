@@ -23,7 +23,7 @@ function ProductCatalog() {
 
   const fetchProducts = async () => {
     try {
-      const res = await api.get('/products/read.php');
+      const res = await api.get('/products');
       if (res.data?.data) {
         setProducts(res.data.data);
       }
@@ -64,7 +64,7 @@ function ProductCatalog() {
     try {
       const numPrice = parseFloat(editForm.price);
       const numStock = parseInt(editForm.stock, 10);
-      await api.put('/products/update.php', {
+      await api.put('/products', {
         id: editingProduct.id,
         name: editForm.name,
         price: numPrice,
