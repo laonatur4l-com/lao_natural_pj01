@@ -60,14 +60,14 @@ router.post('/', authenticate, authorize('owner', 'employee'), validateCategory,
   }
 });
 
-/**
- * PUT /api/categories/:id
- * Update category name (Staff/Owner only)
- */
-router.put('/:id', authenticate, authorize('owner', 'employee'), validateCategory, async (req, res) => {
+const handleUpdateCategory = async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id || req.body.id;
     const { name } = req.body;
+
+    if (!id || !name) {
+      return res.status(400).json({ error: 'Category ID and name are required.' });
+    }
 
     const { data: category, error } = await supabaseAdmin
       .from('categories')
@@ -87,15 +87,22 @@ router.put('/:id', authenticate, authorize('owner', 'employee'), validateCategor
     console.error('Update category error:', err);
     res.status(500).json({ error: 'Server error updating category.' });
   }
-});
+};
+
+router.put('/', authenticate, authorize('owner', 'employee'), validateCategory, handleUpdateCategory);
+router.put('/:id', authenticate, authorize('owner', 'employee'), validateCategory, handleUpdateCategory);
 
 /**
- * DELETE /api/categories/:id
+ * DELETE /api/categories/:id or DELETE /api/categories
  * Delete category (Staff/Owner only)
  */
-router.delete('/:id', authenticate, authorize('owner', 'employee'), async (req, res) => {
+const handleDeleteCategory = async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id || req.body?.id || req.query?.id;
+
+    if (!id) {
+      return res.status(400).json({ error: 'Category ID is required.' });
+    }
 
     const { error } = await supabaseAdmin
       .from('categories')
@@ -113,6 +120,9 @@ router.delete('/:id', authenticate, authorize('owner', 'employee'), async (req, 
     console.error('Delete category error:', err);
     res.status(500).json({ error: 'Server error deleting category.' });
   }
-});
+};
+
+router.delete('/', authenticate, authorize('owner', 'employee'), handleDeleteCategory);
+router.delete('/:id', authenticate, authorize('owner', 'employee'), handleDeleteCategory);
 
 export default router;

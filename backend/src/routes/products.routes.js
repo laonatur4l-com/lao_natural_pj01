@@ -213,13 +213,13 @@ router.post('/', authenticate, authorize('owner', 'employee'), validateProduct, 
   }
 });
 
-/**
- * PUT /api/products/:id
- * Update product (Staff/Owner only)
- */
-router.put('/:id', authenticate, authorize('owner', 'employee'), validateProductUpdate, async (req, res) => {
+const handleUpdateProduct = async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id || req.body.id;
+    if (!id) {
+      return res.status(400).json({ error: 'Product ID is required.' });
+    }
+
     const allowedFields = [
       'name', 'description', 'category', 'size', 'price',
       'price_lak', 'price_thb', 'price_usd', 'import_price',
@@ -252,15 +252,21 @@ router.put('/:id', authenticate, authorize('owner', 'employee'), validateProduct
     console.error('Update product exception:', err);
     res.status(500).json({ error: 'Server error updating product.' });
   }
-});
+};
+
+router.put('/', authenticate, authorize('owner', 'employee'), validateProductUpdate, handleUpdateProduct);
+router.put('/:id', authenticate, authorize('owner', 'employee'), validateProductUpdate, handleUpdateProduct);
 
 /**
- * DELETE /api/products/:id
+ * DELETE /api/products/:id or DELETE /api/products
  * Soft delete product (Staff/Owner only)
  */
-router.delete('/:id', authenticate, authorize('owner', 'employee'), async (req, res) => {
+const handleDeleteProduct = async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id || req.body?.id || req.query?.id;
+    if (!id) {
+      return res.status(400).json({ error: 'Product ID is required.' });
+    }
 
     const { error } = await supabaseAdmin
       .from('products')
@@ -278,7 +284,10 @@ router.delete('/:id', authenticate, authorize('owner', 'employee'), async (req, 
     console.error('Delete product exception:', err);
     res.status(500).json({ error: 'Server error deleting product.' });
   }
-});
+};
+
+router.delete('/', authenticate, authorize('owner', 'employee'), handleDeleteProduct);
+router.delete('/:id', authenticate, authorize('owner', 'employee'), handleDeleteProduct);
 
 /**
  * POST /api/products/upload-image

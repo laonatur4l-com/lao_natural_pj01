@@ -124,13 +124,13 @@ router.post('/', authenticate, authorize('owner', 'employee'), validatePromotion
   }
 });
 
-/**
- * PUT /api/promotions/:id
- * Update promotion (Staff/Owner)
- */
-router.put('/:id', authenticate, authorize('owner', 'employee'), async (req, res) => {
+const handleUpdatePromotion = async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id || req.body.id;
+    if (!id) {
+      return res.status(400).json({ error: 'Promotion ID is required.' });
+    }
+
     const {
       title, status, discount_percent, promo_price_lak,
       promo_price_thb, promo_price_usd, promo_stock,
@@ -168,15 +168,21 @@ router.put('/:id', authenticate, authorize('owner', 'employee'), async (req, res
     console.error('Update promotion error:', err);
     res.status(500).json({ error: 'Server error updating promotion.' });
   }
-});
+};
+
+router.put('/', authenticate, authorize('owner', 'employee'), handleUpdatePromotion);
+router.put('/:id', authenticate, authorize('owner', 'employee'), handleUpdatePromotion);
 
 /**
- * DELETE /api/promotions/:id
+ * DELETE /api/promotions/:id or DELETE /api/promotions
  * Delete promotion (Staff/Owner)
  */
-router.delete('/:id', authenticate, authorize('owner', 'employee'), async (req, res) => {
+const handleDeletePromotion = async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id || req.body?.id || req.query?.id;
+    if (!id) {
+      return res.status(400).json({ error: 'Promotion ID is required.' });
+    }
 
     const { error } = await supabaseAdmin
       .from('promotions')
@@ -194,6 +200,9 @@ router.delete('/:id', authenticate, authorize('owner', 'employee'), async (req, 
     console.error('Delete promotion error:', err);
     res.status(500).json({ error: 'Server error deleting promotion.' });
   }
-});
+};
+
+router.delete('/', authenticate, authorize('owner', 'employee'), handleDeletePromotion);
+router.delete('/:id', authenticate, authorize('owner', 'employee'), handleDeletePromotion);
 
 export default router;
