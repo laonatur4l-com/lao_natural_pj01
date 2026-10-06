@@ -81,12 +81,15 @@ export const exchangeChannel = typeof window !== 'undefined' && typeof Broadcast
 
 export const setExchangeRates = (newRates) => {
   let updated = false;
-  if (newRates?.THB && parseFloat(newRates.THB) > 0) {
-    EXCHANGE_RATES.THB = parseFloat(newRates.THB);
+  const thb = parseFloat(newRates?.THB);
+  const usd = parseFloat(newRates?.USD);
+
+  if (!isNaN(thb) && thb > 0 && EXCHANGE_RATES.THB !== thb) {
+    EXCHANGE_RATES.THB = thb;
     updated = true;
   }
-  if (newRates?.USD && parseFloat(newRates.USD) > 0) {
-    EXCHANGE_RATES.USD = parseFloat(newRates.USD);
+  if (!isNaN(usd) && usd > 0 && EXCHANGE_RATES.USD !== usd) {
+    EXCHANGE_RATES.USD = usd;
     updated = true;
   }
   if (updated) {
@@ -97,6 +100,7 @@ export const setExchangeRates = (newRates) => {
       }
     } catch (e) {}
   }
+  return updated;
 };
 
 /**

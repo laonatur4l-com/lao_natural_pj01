@@ -171,8 +171,13 @@ export const CartProvider = ({ children }) => {
     if (channel) {
       channel.onmessage = (event) => {
         if (event.data?.THB && event.data?.USD) {
-          setExchangeRates(event.data);
-          setExchangeRatesState({ ...event.data });
+          const thb = parseFloat(event.data.THB);
+          const usd = parseFloat(event.data.USD);
+          if (!isNaN(thb) && !isNaN(usd)) {
+            EXCHANGE_RATES.THB = thb;
+            EXCHANGE_RATES.USD = usd;
+            setExchangeRatesState({ THB: thb, USD: usd });
+          }
         }
       };
     }
@@ -183,8 +188,13 @@ export const CartProvider = ({ children }) => {
         try {
           const parsed = JSON.parse(e.newValue);
           if (parsed?.THB && parsed?.USD) {
-            setExchangeRates(parsed);
-            setExchangeRatesState({ ...parsed });
+            const thb = parseFloat(parsed.THB);
+            const usd = parseFloat(parsed.USD);
+            if (!isNaN(thb) && !isNaN(usd)) {
+              EXCHANGE_RATES.THB = thb;
+              EXCHANGE_RATES.USD = usd;
+              setExchangeRatesState({ THB: thb, USD: usd });
+            }
           }
         } catch (err) { }
       }
