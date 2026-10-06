@@ -299,13 +299,13 @@ router.post('/employees', authenticate, authorize('owner'), validateUserCreate, 
   }
 });
 
-/**
- * DELETE /api/admin/employees/:id
- * Delete employee account (Owner only)
- */
-router.delete('/employees/:id', authenticate, authorize('owner'), async (req, res) => {
+const handleDeleteEmployee = async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id || req.body?.id || req.query?.id;
+
+    if (!id) {
+      return res.status(400).json({ error: 'Employee ID is required.' });
+    }
 
     const { data: targetProfile } = await supabaseAdmin
       .from('profiles')
@@ -329,7 +329,10 @@ router.delete('/employees/:id', authenticate, authorize('owner'), async (req, re
     console.error('Delete employee error:', err);
     res.status(500).json({ error: 'Server error deleting employee.' });
   }
-});
+};
+
+router.delete('/employees/:id', authenticate, authorize('owner'), handleDeleteEmployee);
+router.delete('/employees', authenticate, authorize('owner'), handleDeleteEmployee);
 
 /**
  * GET /api/admin/users
