@@ -241,6 +241,111 @@ router.post('/register', validateRegister, async (req, res) => {
 });
 
 /**
+ * POST /api/auth/google-sync
+ * Syncs user profile when signing in via Google OAuth
+ */
+router.post('/google-sync', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization || req.headers['authorization'];
+    const token = (authHeader && authHeader.startsWith('Bearer '))
+      ? authHeader.split(' ')[1]
+      : req.body?.token;
+
+    if (!token) {
+      return res.status(401).json({ error: 'Access token required for Google sync.' });
+    }
+
+    const { data: { user }, error: authErr } = await supabaseAdmin.auth.getUser(token);
+
+    if (authErr || !user) {
+      return res.status(401).json({ error: 'Invalid Google session token.' });
+    }
+
+    const cleanEmail = (user.email || '').toLowerCase().trim();
+    const fullName = user.user_metadata?.full_name || user.user_metadata?.name || cleanEmail.split('@')[0];
+    const avatarUrl = user.user_metadata?.avatar_url || user.user_metadata?.picture || null;
+
+    // 1. Check if profile already exists by auth_id or email
+    let { data: profile } = await supabaseAdmin
+      .from('profiles')
+      .select('*')
+      .or(`auth_id.eq.${user.id},email.eq.${cleanEmail}`)
+      .maybeSingle();
+
+    // Check if user is configured as an owner
+    const configuredOwnerEmails = (process.env.OWNER_EMAILS || 'superadmin@laonatural.com,owner@laonatural.com')
+      .toLowerCase()
+      .split(',')
+      .map(e => e.trim());
+    const shouldBeOwner = configuredOwnerEmails.includes(cleanEmail);
+
+    if (!profile) {
+      // 2. Create new profile if first time logging in
+      const { data: newProfile, error: insertErr } = await supabaseAdmin
+        .from('profiles')
+        .insert({
+          auth_id: user.id,
+          name: fullName,
+          email: cleanEmail,
+          role: shouldBeOwner ? 'owner' : 'user',
+          profile_picture: avatarUrl,
+        })
+        .select()
+        .single();
+
+      if (insertErr) {
+        console.error('Error inserting profile for Google user:', insertErr.message);
+        throw insertErr;
+      }
+      profile = newProfile;
+    } else {
+      // Update auth_id, avatar, and promote to owner if email is in OWNER_EMAILS
+      const updateData = {};
+      if (!profile.auth_id || profile.auth_id !== user.id) {
+        updateData.auth_id = user.id;
+      }
+      if (shouldBeOwner && profile.role !== 'owner') {
+        updateData.role = 'owner';
+      }
+      if (!profile.profile_picture && avatarUrl) {
+        updateData.profile_picture = avatarUrl;
+      }
+
+      if (Object.keys(updateData).length > 0) {
+        const { data: updatedProfile, error: updateErr } = await supabaseAdmin
+          .from('profiles')
+          .update(updateData)
+          .eq('id', profile.id)
+          .select()
+          .single();
+
+        if (!updateErr && updatedProfile) {
+          profile = updatedProfile;
+        }
+      }
+    }
+
+    return res.json({
+      message: 'Successful login.',
+      jwt: token,
+      user: {
+        id: profile.id,
+        name: profile.name,
+        email: profile.email,
+        role: profile.role,
+        address: profile.address,
+        phone: profile.phone,
+        express_company: profile.express_company,
+        profile_picture: profile.profile_picture || avatarUrl,
+      },
+    });
+  } catch (err) {
+    console.error('Google sync error:', err);
+    return res.status(500).json({ error: 'Failed to process Google sign-in.' });
+  }
+});
+
+/**
  * GET /api/auth/me
  * Returns current authenticated user profile
  */
