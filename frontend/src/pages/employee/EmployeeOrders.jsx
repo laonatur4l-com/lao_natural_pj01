@@ -4,12 +4,15 @@ import { Search, Truck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { formatCurrency, formatId } from '../../utils/formatters';
 import AutoTranslate from '../../components/AutoTranslate';
+import RejectPaymentModal from '../../components/RejectPaymentModal';
 
 function EmployeeOrders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
   const [search, setSearch] = useState('');
+  const [rejectingOrder, setRejectingOrder] = useState(null);
+  const [submittingReject, setSubmittingReject] = useState(false);
 
   useEffect(() => { fetchOrders(); }, []);
 
@@ -24,24 +27,31 @@ function EmployeeOrders() {
     }
   };
 
-  const updateStatus = async (id, newStatus) => {
-    let rejectionReason = null;
+  const handleStatusChange = (order, newStatus) => {
     if (newStatus === 'payment_rejected') {
-      rejectionReason = prompt("Please enter the reason for rejecting payment:");
-      if (rejectionReason === null) {
-        return;
-      }
-      if (!rejectionReason.trim()) {
-        alert("Rejection reason is required.");
-        return;
-      }
-      rejectionReason = rejectionReason.trim();
+      setRejectingOrder(order);
+      return;
     }
+    updateStatus(order.id, newStatus);
+  };
+
+  const updateStatus = async (id, newStatus, rejectionReason = null) => {
     try {
       await api.put('/orders/status', { id, status: newStatus, rejection_reason: rejectionReason });
       setOrders(orders.map(o => o.id === id ? { ...o, status: newStatus, rejection_reason: rejectionReason } : o));
     } catch (err) {
       alert("Failed to update status");
+    }
+  };
+
+  const handleConfirmReject = async (reason) => {
+    if (!rejectingOrder) return;
+    setSubmittingReject(true);
+    try {
+      await updateStatus(rejectingOrder.id, 'payment_rejected', reason);
+      setRejectingOrder(null);
+    } finally {
+      setSubmittingReject(false);
     }
   };
 
@@ -160,7 +170,7 @@ function EmployeeOrders() {
                   <td className="p-4">
                     <select
                       value={order.status}
-                      onChange={(e) => updateStatus(order.id, e.target.value)}
+                      onChange={(e) => handleStatusChange(order, e.target.value)}
                       className="bg-white border border-gray-200 text-xs p-2 rounded-lg focus:outline-none focus:border-[#8A9A5B] cursor-pointer"
                     >
                       <option value="pending_payment">Pending Payment</option>
@@ -179,6 +189,15 @@ function EmployeeOrders() {
           </table>
         </div>
       )}
+
+      {/* Reject Payment Modal */}
+      <RejectPaymentModal
+        isOpen={!!rejectingOrder}
+        order={rejectingOrder}
+        onClose={() => setRejectingOrder(null)}
+        onConfirm={handleConfirmReject}
+        isSubmitting={submittingReject}
+      />
     </div>
     </AutoTranslate>
   );

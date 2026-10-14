@@ -5,6 +5,7 @@ import { ArrowLeft, Package, Truck, CheckCircle, Info } from 'lucide-react';
 import { formatId, formatCurrency, getThbPrice, getUsdPrice } from '../utils/formatters';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import RejectPaymentModal from '../components/RejectPaymentModal';
 
 function OrderDetail() {
   const { id } = useParams();
@@ -16,6 +17,7 @@ function OrderDetail() {
   const [loading, setLoading] = useState(true);
   const [approving, setApproving] = useState(false);
   const [rejecting, setRejecting] = useState(false);
+  const [showRejectModal, setShowRejectModal] = useState(false);
   
   // Inline edit state
   const [isEditingAddress, setIsEditingAddress] = useState(false);
@@ -174,27 +176,19 @@ function OrderDetail() {
     }
   };
 
-  const handleRejectPayment = async () => {
-    const reasonPrompt = language === 'la'
-      ? 'ກະລຸນາໃສ່ເຫດຜົນໃນການປະຕິເສດການຊຳລະເງິນ (ເຊັ່ນ: ສະລິບບໍ່ຖືກຕ້ອງ, ໂອນເງິນບໍ່ຄົບ):'
-      : language === 'th'
-      ? 'กรุณาระบุเหตุผลในการปฏิเสธการชำระเงิน (เช่น สลิปไม่ถูกต้อง, โอนเงินไม่ครบ):'
-      : 'Please enter the reason for rejecting this payment (e.g. Invalid transfer slip, incorrect transfer amount):';
+  const handleRejectPayment = () => {
+    setShowRejectModal(true);
+  };
 
-    const reason = prompt(reasonPrompt);
-    if (reason === null) return;
-    if (!reason.trim()) {
-      alert(language === 'la' ? 'ກະລຸນາໃສ່ເຫດຜົນ' : language === 'th' ? 'กรุณาระบุเหตุผล' : 'Rejection reason is required.');
-      return;
-    }
-
+  const handleConfirmReject = async (reason) => {
     setRejecting(true);
     try {
       await api.put(`/orders/${order.id}/status`, {
         status: 'payment_rejected',
-        rejection_reason: reason.trim()
+        rejection_reason: reason
       });
-      setOrder({ ...order, status: 'payment_rejected', rejection_reason: reason.trim() });
+      setOrder({ ...order, status: 'payment_rejected', rejection_reason: reason });
+      setShowRejectModal(false);
     } catch (err) {
       console.error(err);
       alert("Failed to reject payment status.");
@@ -642,6 +636,15 @@ function OrderDetail() {
           </div>
         </div>
       </div>
+
+      {/* Reject Payment Modal */}
+      <RejectPaymentModal
+        isOpen={showRejectModal}
+        order={order}
+        onClose={() => setShowRejectModal(false)}
+        onConfirm={handleConfirmReject}
+        isSubmitting={rejecting}
+      />
     </div>
   );
 }
