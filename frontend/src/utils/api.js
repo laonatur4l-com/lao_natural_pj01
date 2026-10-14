@@ -23,15 +23,28 @@ const api = axios.create({
   },
 });
 
-// Interceptor to add Authorization JWT header (auto-refreshes Supabase token)
+// Interceptor to add Authorization JWT header
 api.interceptors.request.use(async config => {
-  let token = null;
+  let token = localStorage.getItem('token');
+  let storedUser = null;
+
+  try {
+    const storedUserStr = localStorage.getItem('user');
+    if (storedUserStr) storedUser = JSON.parse(storedUserStr);
+  } catch (e) {}
+
+  // If user is staff/employee/owner with password or mock token, preserve their token!
+  const isStaff = storedUser && (storedUser.role === 'owner' || storedUser.role === 'employee');
 
   try {
     const { data: sessionData } = await supabase.auth.getSession();
-    if (sessionData?.session?.access_token) {
-      token = sessionData.session.access_token;
+    const session = sessionData?.session;
+    // Only use Supabase session if it matches the current logged-in user's email
+    if (session?.access_token && session.user?.email && storedUser?.email && session.user.email.toLowerCase() === storedUser.email.toLowerCase()) {
+      token = session.access_token;
       localStorage.setItem('token', token);
+    } else if (isStaff && token && (token.startsWith('mock-jwt-token-') || token.startsWith('user-'))) {
+      // Keep existing employee/owner token; do NOT overwrite with customer Google session
     }
   } catch (e) {
     // fallback if supabase client fails
@@ -41,19 +54,14 @@ api.interceptors.request.use(async config => {
     token = localStorage.getItem('token');
   }
 
-  if (!token) {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      try {
-        const u = JSON.parse(storedUser);
-        if (u?.id) {
-          token = `mock-jwt-token-user-${u.id}`;
-          localStorage.setItem('token', token);
-        } else if (u?.role) {
-          token = `mock-jwt-token-${u.role}`;
-          localStorage.setItem('token', token);
-        }
-      } catch (e) { }
+  // Fallback for staff or mock login if token is missing
+  if (!token && storedUser) {
+    if (storedUser.role === 'owner' || storedUser.role === 'employee') {
+      token = `mock-jwt-token-${storedUser.role}`;
+      localStorage.setItem('token', token);
+    } else if (storedUser.id) {
+      token = `mock-jwt-token-user-${storedUser.id}`;
+      localStorage.setItem('token', token);
     }
   }
 
