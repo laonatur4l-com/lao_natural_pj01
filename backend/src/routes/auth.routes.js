@@ -18,6 +18,7 @@ router.post('/login', validateLogin, async (req, res) => {
       'superadmin': { id: 999, name: 'Super Admin', email: 'superadmin@laonatural.com', role: 'owner', phone: '020 9999 9999', address: 'Vientiane Capital', express_company: 'Anousith' },
       'superadmin@laonatural.com': { id: 999, name: 'Super Admin', email: 'superadmin@laonatural.com', role: 'owner', phone: '020 9999 9999', address: 'Vientiane Capital', express_company: 'Anousith' },
       'owner@laonatural.com': { id: 1, name: 'Store Owner', email: 'owner@laonatural.com', role: 'owner', phone: '020 5555 9999', address: 'Vientiane Capital', express_company: 'Anousith' },
+      'laonaturalowner@gmail.com': { id: 2, name: 'Store Owner', email: 'laonaturalowner@gmail.com', role: 'owner', phone: '020 5555 9999', address: 'Vientiane Capital', express_company: 'Anousith' },
       'admin@laonatural.com': { id: 1, name: 'Store Owner', email: 'admin@laonatural.com', role: 'owner', phone: '020 5555 9999', address: 'Vientiane Capital', express_company: 'Anousith' },
       'employee@laonatural.com': { id: 2, name: 'Staff Member', email: 'employee@laonatural.com', role: 'employee', phone: '020 5555 8888', address: 'Vientiane Capital', express_company: 'HAL Logistics' },
       'user@laonatural.com': { id: 3, name: 'Valued Customer', email: 'user@laonatural.com', role: 'user', phone: '020 5555 7777', address: 'Luang Prabang', express_company: 'Anousith' }
@@ -273,7 +274,7 @@ router.post('/google-sync', async (req, res) => {
       .maybeSingle();
 
     // Check if user is configured as an owner
-    const configuredOwnerEmails = (process.env.OWNER_EMAILS || 'superadmin@laonatural.com,owner@laonatural.com')
+    const configuredOwnerEmails = (process.env.OWNER_EMAILS || 'superadmin@laonatural.com,owner@laonatural.com,laonaturalowner@gmail.com')
       .toLowerCase()
       .split(',')
       .map(e => e.trim());

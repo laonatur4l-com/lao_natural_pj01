@@ -10,6 +10,7 @@ import Dashboard from './pages/Dashboard';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
+import OAuthHandler from './components/OAuthHandler';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { LanguageProvider } from './context/LanguageContext';
@@ -41,6 +42,7 @@ function App() {
       <AuthProvider>
         <CartProvider>
           <Router>
+            <OAuthHandler />
             <Routes>
               {/* Admin Portal — Owner only (no Navbar/Footer) */}
               <Route
