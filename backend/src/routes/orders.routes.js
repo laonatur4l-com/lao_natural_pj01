@@ -74,24 +74,51 @@ router.post('/', authenticate, validateOrderCreate, async (req, res) => {
       }
 
       // Check for active promotional price
-      let itemPrice = Number(dbProd.price_lak || dbProd.price || 0);
+      let origUnitPrice = Number(dbProd.price_lak || dbProd.price || 0);
+      let itemTotal = origUnitPrice * item.quantity;
+      let effectiveUnitPrice = origUnitPrice;
       const promo = promoMap.get(dbProd.id);
 
       if (promo) {
-        if (Number(promo.promo_price_lak) > 0) {
-          itemPrice = Number(promo.promo_price_lak);
+        const totalPromoStock = parseInt(promo.promo_stock) > 0 ? parseInt(promo.promo_stock) : 9999;
+        const promoSold = parseInt(promo.promo_sold || 0);
+        const remainingPromoStock = Math.max(0, totalPromoStock - promoSold);
+        const promoQty = Math.min(item.quantity, remainingPromoStock);
+        const regularQty = item.quantity - promoQty;
+
+        if (promo.type === 'b1g1') {
+          const buyQty = promo.buy_qty ? Math.max(1, parseInt(promo.buy_qty)) : 1;
+          const getQty = promo.get_qty ? Math.max(1, parseInt(promo.get_qty)) : 1;
+          const setSize = buyQty + getQty;
+
+          const numSets = Math.floor(promoQty / setSize);
+          const remainder = promoQty % setSize;
+
+          const paidInSets = numSets * buyQty;
+          const paidInRemainder = Math.min(remainder, buyQty);
+          const totalPaidPromoQty = paidInSets + paidInRemainder;
+          const totalPayableQty = totalPaidPromoQty + regularQty;
+
+          itemTotal = totalPayableQty * origUnitPrice;
+          effectiveUnitPrice = item.quantity > 0 ? (itemTotal / item.quantity) : origUnitPrice;
+        } else if (Number(promo.promo_price_lak) > 0) {
+          const promoUnitPrice = Number(promo.promo_price_lak);
+          itemTotal = (promoQty * promoUnitPrice) + (regularQty * origUnitPrice);
+          effectiveUnitPrice = item.quantity > 0 ? (itemTotal / item.quantity) : promoUnitPrice;
         } else if (Number(promo.discount_percent) > 0) {
-          itemPrice = itemPrice * (1 - Number(promo.discount_percent) / 100);
+          const discPercent = Number(promo.discount_percent);
+          const discUnit = origUnitPrice * (1 - discPercent / 100);
+          itemTotal = (promoQty * discUnit) + (regularQty * origUnitPrice);
+          effectiveUnitPrice = item.quantity > 0 ? (itemTotal / item.quantity) : origUnitPrice;
         }
       }
 
-      const itemTotal = itemPrice * item.quantity;
       calculatedTotalPrice += itemTotal;
 
       validatedItems.push({
         product_id: dbProd.id,
         quantity: item.quantity,
-        price: itemPrice,
+        price: effectiveUnitPrice,
         size: item.selectedSize || item.size || null,
       });
 
