@@ -58,7 +58,12 @@ function OrderDetail() {
       }
     } catch (err) {
       console.error(err);
-      alert('Failed to upload proof of payment. Please try again.');
+      const msg = err.response?.data?.error 
+        || err.response?.data?.message 
+        || (err.code === 'ERR_NETWORK' ? 'Network error: Cannot reach backend server.' : null) 
+        || err.message 
+        || 'Failed to upload proof of payment. Please try again.';
+      alert(msg);
       setNewScreenshotPreview(null);
       setNewScreenshotUrl('');
     } finally {

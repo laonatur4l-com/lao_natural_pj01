@@ -63,13 +63,32 @@ export const authenticate = async (req, res, next) => {
     }
 
     // Fetch the user's profile (role, name, etc.) from our profiles table
-    const { data: profile, error: profileError } = await supabaseAdmin
+    let { data: profile } = await supabaseAdmin
       .from('profiles')
       .select('id, name, email, role, phone, address')
       .eq('auth_id', user.id)
-      .single();
+      .maybeSingle();
 
-    if (profileError || !profile) {
+    if (!profile && user.email) {
+      // Fallback matching by email if auth_id hasn't synced yet
+      const cleanEmail = user.email.toLowerCase().trim();
+      const { data: emailProfile } = await supabaseAdmin
+        .from('profiles')
+        .select('id, name, email, role, phone, address')
+        .ilike('email', cleanEmail)
+        .maybeSingle();
+
+      if (emailProfile) {
+        profile = emailProfile;
+        // Self-heal: link auth_id to profile
+        await supabaseAdmin
+          .from('profiles')
+          .update({ auth_id: user.id })
+          .eq('id', emailProfile.id);
+      }
+    }
+
+    if (!profile) {
       return res.status(401).json({ error: 'User profile not found.' });
     }
 

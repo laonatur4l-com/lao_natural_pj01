@@ -182,7 +182,13 @@ function Checkout() {
       setTimeout(() => navigate('/dashboard'), 3000);
     } catch (err) {
        console.error("Order creation failed", err);
-       setError(err.response?.data?.message || "Something went wrong placing your order. Please try again.");
+       const errorMsg = err.response?.data?.error 
+         || (err.response?.data?.details ? err.response.data.details.map(d => d.message).join(', ') : null)
+         || err.response?.data?.message 
+         || (err.code === 'ERR_NETWORK' ? 'Cannot reach server. Please check your internet or server status.' : null)
+         || err.message 
+         || "Something went wrong placing your order. Please try again.";
+       setError(errorMsg);
     } finally {
        setLoading(false);
     }

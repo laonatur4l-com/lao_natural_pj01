@@ -29,7 +29,10 @@ function Dashboard() {
     const fetchData = async () => {
       try {
         const [ordersRes, profileRes, popularRes] = await Promise.all([
-          api.get('/orders'),
+          api.get('/orders').catch(err => {
+            console.error('Fetch orders error in dashboard:', err);
+            return { data: { data: [] } };
+          }),
           api.get('/user/profile').catch(() => ({ data: { data: null } })),
           api.get('/products/popular').catch(() => ({ data: { data: [] } }))
         ]);
