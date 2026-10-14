@@ -13,8 +13,8 @@ function AdminLayout() {
   // Auto-expand if we're on a /admin/users route
   const [usersOpen, setUsersOpen] = useState(location.pathname.startsWith('/admin/users'));
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     navigate('/login');
   };
 

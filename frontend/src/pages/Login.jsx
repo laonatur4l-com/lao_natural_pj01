@@ -16,9 +16,12 @@ function Login() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Listen for Supabase OAuth redirect back to /login
+  // Listen for Supabase OAuth redirect back to /login only when hash contains OAuth tokens
   useEffect(() => {
     const handleOAuthCallback = async () => {
+      const hasAuthHash = window.location.hash.includes('access_token=') || window.location.hash.includes('error=');
+      if (!hasAuthHash) return;
+
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.access_token) {
@@ -29,6 +32,7 @@ function Login() {
 
           if (res.data?.user && res.data?.jwt) {
             login(res.data.user, res.data.jwt);
+            window.history.replaceState(null, '', window.location.pathname);
             const role = res.data.user.role;
             const from = location.state?.from?.pathname;
 

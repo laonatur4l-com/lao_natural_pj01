@@ -12,8 +12,8 @@ function Navbar() {
   const { language, setLanguage, t } = useLanguage();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     setMobileMenuOpen(false);
     navigate('/login');
   };

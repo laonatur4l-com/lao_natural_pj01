@@ -8,8 +8,8 @@ function EmployeeLayout() {
   const { t, language, setLanguage } = useLanguage();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     navigate('/login');
   };
 
