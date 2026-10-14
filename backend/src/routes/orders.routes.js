@@ -210,6 +210,7 @@ router.get('/', authenticate, async (req, res) => {
       .from('orders')
       .select(`
         *,
+        user:profiles(name, email),
         items:order_items(
           id, quantity, price, size,
           product:products(id, name, image_url, category)
@@ -228,7 +229,14 @@ router.get('/', authenticate, async (req, res) => {
       return res.json({ data: [] });
     }
 
-    res.json({ data: orders.map(ensureOrderTotalWithVat) });
+    const processedOrders = orders.map(o => {
+      const formatted = ensureOrderTotalWithVat(o);
+      formatted.customer_name = formatted.customer_name || formatted.user?.name || formatted.shipping_name || 'Customer';
+      formatted.customer_email = formatted.customer_email || formatted.user?.email || formatted.shipping_phone || '';
+      return formatted;
+    });
+
+    res.json({ data: processedOrders });
   } catch (err) {
     console.error('Fetch orders exception:', err);
     res.json({ data: [] });

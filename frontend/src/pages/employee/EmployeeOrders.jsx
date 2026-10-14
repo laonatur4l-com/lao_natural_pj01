@@ -140,14 +140,14 @@ function EmployeeOrders() {
                   <td className="p-4">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-dark">{order.customer_name}</span>
+                        <span className="text-dark font-medium">{order.customer_name || order.shipping_name || 'Customer'}</span>
                         {order.status === 'pending_payment' && (
                           <span className="text-red-500 font-semibold text-xs px-1.5 py-0.5 bg-red-50 rounded border border-red-100 animate-pulse">
                             New
                           </span>
                         )}
                       </div>
-                      <span className="block text-xs text-gray-400">{order.customer_email}</span>
+                      <span className="block text-xs text-gray-400">{order.customer_email || order.shipping_phone || ''}</span>
                     </div>
                   </td>
                   <td className="p-4 text-gray-500 text-xs">{new Date(order.created_at).toLocaleDateString()}</td>
