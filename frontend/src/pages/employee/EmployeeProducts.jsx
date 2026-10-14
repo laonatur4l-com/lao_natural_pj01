@@ -120,38 +120,81 @@ function EmployeeProducts() {
     }
   };
 
-  const handleImageUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  // Client-side image compression to prevent timeouts, huge payloads, or network drops on mobile
+  const compressImageForUpload = (file) => {
+    return new Promise((resolve) => {
+      if (!file || !file.type.startsWith('image/') || file.type.includes('svg') || file.size < 800 * 1024) {
+        return resolve(file);
+      }
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const MAX_DIM = 1600;
+          let width = img.width;
+          let height = img.height;
+          if (width > MAX_DIM || height > MAX_DIM) {
+            if (width > height) {
+              height = Math.round((height * MAX_DIM) / width);
+              width = MAX_DIM;
+            } else {
+              width = Math.round((width * MAX_DIM) / height);
+              height = MAX_DIM;
+            }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          canvas.toBlob((blob) => {
+            if (blob && blob.size < file.size) {
+              resolve(new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' }));
+            } else {
+              resolve(file);
+            }
+          }, 'image/jpeg', 0.85);
+        };
+        img.onerror = () => resolve(file);
+        img.src = e.target.result;
+      };
+      reader.onerror = () => resolve(file);
+      reader.readAsDataURL(file);
+    });
+  };
 
-    // Preview
+  const handleImageUpload = async (e) => {
+    const rawFile = e.target.files[0];
+    if (!rawFile) return;
+
+    // Show instant preview
     const reader = new FileReader();
     reader.onloadend = () => setImagePreview(reader.result);
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(rawFile);
 
-    // Upload
+    // Upload with client-side optimization
     setUploading(true);
     try {
+      const fileToUpload = await compressImageForUpload(rawFile);
       const uploadForm = new FormData();
-      uploadForm.append('image', file);
+      uploadForm.append('image', fileToUpload);
+      uploadForm.append('file', fileToUpload);
 
-      const res = await api.post('/products/upload-image', uploadForm, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
+      const res = await api.post('/products/upload-image', uploadForm);
 
       if (res.data && res.data.image_url) {
         setFormData(prev => ({ ...prev, image_url: res.data.image_url }));
       } else {
         alert(res.data?.message || 'Upload failed');
-        setImagePreview(null);
+        if (!formData.image_url) setImagePreview(null);
       }
     } catch (err) {
-      alert('Upload failed: ' + (err.response?.data?.message || err.message));
-      setImagePreview(null);
+      const msg = err.response?.data?.error || err.response?.data?.message || err.message;
+      alert(`Upload failed: ${msg}`);
+      if (!formData.image_url) setImagePreview(null);
     } finally {
       setUploading(false);
+      e.target.value = '';
     }
   };
 

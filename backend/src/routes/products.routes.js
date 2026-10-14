@@ -293,7 +293,15 @@ router.delete('/:id', authenticate, authorize('owner', 'employee'), handleDelete
  * POST /api/products/upload-image
  * Upload product image to Supabase Storage bucket 'products'
  */
-router.post('/upload-image', authenticate, authorize('owner', 'employee'), upload.single('image'), async (req, res) => {
+router.post('/upload-image', authenticate, authorize('owner', 'employee'), (req, res, next) => {
+  upload.fields([{ name: 'image', maxCount: 1 }, { name: 'file', maxCount: 1 }])(req, res, (err) => {
+    if (err) return next(err);
+    if (!req.file) {
+      req.file = req.files?.image?.[0] || req.files?.file?.[0] || null;
+    }
+    next();
+  });
+}, async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No image file uploaded.' });

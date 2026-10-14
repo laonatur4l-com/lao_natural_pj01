@@ -65,11 +65,29 @@ api.interceptors.request.use(async config => {
     }
   }
 
+  // If data is FormData, remove Content-Type so Axios & browser automatically append multipart boundary
+  if (config.data instanceof FormData) {
+    if (config.headers) {
+      delete config.headers['Content-Type'];
+    }
+  }
+
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
 
   return config;
 });
+
+// Response interceptor for better error messaging on network disconnects / server cold starts
+api.interceptors.response.use(
+  response => response,
+  error => {
+    if (!error.response && (error.message === 'Network Error' || error.message?.includes('Failed to fetch') || error.code === 'ERR_NETWORK')) {
+      error.message = 'Backend server is waking up or temporarily unreachable. Please retry in a few seconds.';
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default api;
