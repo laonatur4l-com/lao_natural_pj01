@@ -5,6 +5,7 @@ import ProductDetail from './pages/ProductDetail';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import OrderDetail from './pages/OrderDetail';
+import Contact from './pages/Contact';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Navbar from './components/Navbar';
@@ -108,6 +109,7 @@ function App() {
                             <OrderDetail />
                           </ProtectedRoute>
                         } />
+                        <Route path="/contact" element={<Contact />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/dashboard" element={
                           <ProtectedRoute allowedRoles={['user', 'owner', 'employee']}>

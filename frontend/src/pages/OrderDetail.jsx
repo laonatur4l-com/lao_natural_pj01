@@ -632,7 +632,12 @@ function OrderDetail() {
           <div className="bg-[#FDFBF7] border border-[#E8DCC4] p-6 rounded-xl text-center">
             <h2 className="text-[10px] uppercase tracking-widest text-[#8A9A5B] mb-2">{language === 'la' ? 'ຕ້ອງການຄວາມຊ່ວຍເຫຼືອ?' : language === 'th' ? 'ต้องการความช่วยเหลือ?' : 'Need Help?'}</h2>
             <p className="text-xs text-gray-500 mb-4">{language === 'la' ? 'ຫາກທ່ານມີຄຳຖາມໃດໆ ກ່ຽວກັບການສັ່ງຊື້, ກະລຸນາຕິດຕໍ່ພະນັກງານຂອງພວກເຮົາ.' : language === 'th' ? 'หากคุณมีคำถามใดๆ เกี่ยวกับการสั่งซื้อนี้ กรุณาติดต่อฝ่ายบริการลูกค้าของเรา' : 'If you have any questions about this order, please contact our support team.'}</p>
-            <button onClick={() => navigate('/contact')} className="text-xs text-dark hover:text-[#8A9A5B] underline uppercase tracking-widest transition-colors cursor-pointer">{language === 'la' ? 'ຕິດຕໍ່ພວກເຮົາ' : language === 'th' ? 'ติดต่อเรา' : 'Contact Us'}</button>
+            <button 
+              onClick={() => navigate(`/contact?order=${encodeURIComponent(order.order_number || ('ORD-' + String(order.id).padStart(3, '0')))}`)} 
+              className="text-xs text-dark hover:text-[#8A9A5B] underline uppercase tracking-widest transition-colors cursor-pointer"
+            >
+              {language === 'la' ? 'ຕິດຕໍ່ພວກເຮົາ' : language === 'th' ? 'ติดต่อเรา' : 'Contact Us'}
+            </button>
           </div>
         </div>
       </div>
