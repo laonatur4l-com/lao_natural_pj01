@@ -113,40 +113,81 @@ function ImportProducts() {
     }
   };
 
+  // Client-side image compression to prevent large payloads / mobile timeouts
+  const compressImageForUpload = (file) => {
+    return new Promise((resolve) => {
+      if (!file || !file.type.startsWith('image/') || file.type.includes('svg') || file.size < 800 * 1024) {
+        return resolve(file);
+      }
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const MAX_DIM = 1600;
+          let width = img.width;
+          let height = img.height;
+          if (width > MAX_DIM || height > MAX_DIM) {
+            if (width > height) {
+              height = Math.round((height * MAX_DIM) / width);
+              width = MAX_DIM;
+            } else {
+              width = Math.round((width * MAX_DIM) / height);
+              height = MAX_DIM;
+            }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          canvas.toBlob((blob) => {
+            if (blob && blob.size < file.size) {
+              resolve(new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' }));
+            } else {
+              resolve(file);
+            }
+          }, 'image/jpeg', 0.85);
+        };
+        img.onerror = () => resolve(file);
+        img.src = e.target.result;
+      };
+      reader.onerror = () => resolve(file);
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleImageUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+    const rawFile = e.target.files[0];
+    if (!rawFile) return;
 
     // Preview
     const reader = new FileReader();
     reader.onloadend = () => setImagePreview(reader.result);
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(rawFile);
 
     // Upload
     setUploading(true);
     try {
+      const fileToUpload = await compressImageForUpload(rawFile);
       const uploadForm = new FormData();
-      uploadForm.append('image', file);
+      uploadForm.append('image', fileToUpload);
+      uploadForm.append('file', fileToUpload);
 
-      const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost/lao_natural_pj01/backend/api/products/upload-image', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` },
-        body: uploadForm
-      });
-      const data = await res.json();
+      const res = await api.post('/products/upload-image', uploadForm);
 
-      if (res.ok && data.image_url) {
-        setFormData(prev => ({ ...prev, image_url: data.image_url }));
+      if (res.data && res.data.image_url) {
+        setFormData(prev => ({ ...prev, image_url: res.data.image_url }));
       } else {
-        alert(data.message || 'Upload failed');
-        setImagePreview(null);
+        alert(res.data?.message || 'Upload failed');
+        if (!formData.image_url) setImagePreview(null);
       }
     } catch (err) {
-      alert('Upload failed: ' + err.message);
-      setImagePreview(null);
+      const errorMsg = err.response?.data?.error || err.response?.data?.message || err.message;
+      alert(`Upload failed: ${errorMsg}`);
+      if (!formData.image_url) setImagePreview(null);
     } finally {
       setUploading(false);
+      e.target.value = '';
     }
   };
 
