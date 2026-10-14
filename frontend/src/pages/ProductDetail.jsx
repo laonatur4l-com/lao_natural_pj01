@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Check, Gift, Tag } from 'lucide-react';
+import { ArrowLeft, Check, Gift, Tag, ShoppingBag } from 'lucide-react';
 import api from '../utils/api';
 import { useCart } from '../context/CartContext';
 import { formatCurrency, getThbPrice, getUsdPrice } from '../utils/formatters';
@@ -236,14 +236,27 @@ function ProductDetail() {
             </ul>
           </div>
 
-          <div className="mt-auto border-t border-[#E8DCC4] pt-8 flex items-end gap-4">
-            <div className="w-24">
-              <label className="block text-xs uppercase tracking-widest text-gray-500 mb-2">{t('quantity')}</label>
-              <div className="flex border border-[#E8DCC4] h-12">
+          {/* B1G1 Promotion Box - full width above action buttons */}
+          {isB1G1 && (
+            <div className="w-full mb-6 p-4 bg-purple-50/90 border border-purple-200/90 rounded-2xl text-xs sm:text-sm text-purple-900 shadow-xs">
+              <span className="font-bold flex items-center gap-2 text-purple-950 mb-1">
+                <Gift size={16} className="text-purple-600 shrink-0" />
+                Buy {product.promotion.buy_qty || 1} Get {product.promotion.get_qty || 1} Free Special:
+              </span>
+              <p className="text-purple-800 leading-relaxed">
+                Adding <span className="font-extrabold text-purple-950">{quantity || 1}</span> items to cart will automatically add <span className="font-extrabold text-purple-950">{Math.floor((quantity || 1) / (product.promotion.buy_qty || 1)) * (product.promotion.get_qty || 1)}</span> FREE item(s) to your cart!
+              </p>
+            </div>
+          )}
+
+          <div className="mt-auto border-t border-[#E8DCC4] pt-6 flex items-end gap-3 sm:gap-4">
+            <div className="w-28 sm:w-32 shrink-0">
+              <label className="block text-xs uppercase tracking-widest text-gray-500 mb-2 font-medium">{t('quantity')}</label>
+              <div className="flex border border-[#E8DCC4] rounded-lg overflow-hidden h-12 bg-white shadow-xs">
                 <button 
                   type="button"
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="w-8 flex items-center justify-center text-dark hover:bg-[#FDFBF7] border-r border-[#E8DCC4] cursor-pointer"
+                  className="w-9 sm:w-10 flex items-center justify-center text-dark hover:bg-gray-50 border-r border-[#E8DCC4] text-base font-semibold cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
                   disabled={currentStock <= 0}
                 >-</button>
                 <input 
@@ -264,13 +277,13 @@ function ProductDetail() {
                   onBlur={() => {
                     if (quantity === '' || quantity < 1) setQuantity(1);
                   }}
-                  className="w-12 text-center text-sm font-medium focus:outline-none bg-white text-dark"
+                  className="w-10 sm:w-12 text-center text-sm font-semibold focus:outline-none bg-white text-dark"
                   disabled={currentStock <= 0}
                 />
                 <button 
                   type="button"
                   onClick={() => setQuantity(Math.min(currentStock, quantity + 1))}
-                  className="w-8 flex items-center justify-center text-dark hover:bg-[#FDFBF7] border-l border-[#E8DCC4] cursor-pointer"
+                  className="w-9 sm:w-10 flex items-center justify-center text-dark hover:bg-gray-50 border-l border-[#E8DCC4] text-base font-semibold cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
                   disabled={currentStock <= 0 || quantity >= currentStock}
                 >+</button>
               </div>
@@ -279,25 +292,20 @@ function ProductDetail() {
               )}
             </div>
 
-            {isB1G1 && (
-              <div className="w-full mb-3 p-3 bg-purple-50 border border-purple-200 rounded-xl text-xs text-purple-900">
-                <span className="font-bold block mb-0.5">🎁 Buy {product.promotion.buy_qty || 1} Get {product.promotion.get_qty || 1} Free Special:</span>
-                Adding <span className="font-extrabold text-purple-950">{quantity || 1}</span> items to cart will automatically add <span className="font-extrabold text-purple-950">{Math.floor((quantity || 1) / (product.promotion.buy_qty || 1)) * (product.promotion.get_qty || 1)}</span> FREE item(s) to your cart!
-              </div>
-            )}
-            
             <button 
               onClick={handleAddToCart}
               disabled={currentStock <= 0 || added}
-              className={`flex-grow h-12 flex items-center justify-center uppercase tracking-widest text-sm transition-colors cursor-pointer ${
+              className={`flex-1 h-12 px-4 sm:px-6 rounded-lg flex items-center justify-center uppercase tracking-widest text-xs sm:text-sm font-semibold transition-all duration-200 shadow-sm cursor-pointer whitespace-nowrap ${
                 added 
                  ? 'bg-primary text-secondary'
-                 : 'bg-dark text-white hover:bg-black disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed'
+                 : 'bg-dark text-white hover:bg-black active:scale-[0.99] disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed'
               }`}
             >
               {added ? (
                 <><Check size={18} className="mr-2" /> Added</>
-              ) : currentStock <= 0 ? t('out_of_stock') : t('add_to_cart')}
+              ) : currentStock <= 0 ? t('out_of_stock') : (
+                <span className="flex items-center gap-2"><ShoppingBag size={18} /> {t('add_to_cart')}</span>
+              )}
             </button>
           </div>
 
