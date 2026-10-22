@@ -42,13 +42,16 @@ function Footer() {
     <footer className="bg-dark text-secondary py-12 mt-12">
       <div className="container mx-auto px-4 lg:px-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
         <div>
-          <div className="flex items-center gap-3 mb-4">
-            <img src="/lao_logo_transparent.png" alt="Lao Natural" className="h-12 md:h-14 w-auto object-contain drop-shadow-md" />
-            <div className="flex flex-col justify-center leading-none">
+          <div className="flex items-center gap-3.5 mb-4">
+            <img src="/lao_logo_transparent.png" alt="Lao Natural" className="h-16 md:h-18 w-auto object-contain drop-shadow-md" />
+            <div className="flex flex-col justify-center leading-tight">
               <span className="font-brand font-black text-lg md:text-xl tracking-tight text-[#E8DCC4]">
                 Lao Natural
               </span>
-              <span className="font-brand font-bold text-[9px] md:text-[10px] tracking-[0.25em] uppercase text-[#74BD25] mt-1">
+              <span className="font-brand font-bold text-[10px] md:text-[11px] tracking-wider lowercase text-[#74BD25] opacity-80 my-0.5">
+                and
+              </span>
+              <span className="font-brand font-extrabold text-xs md:text-sm tracking-[0.2em] uppercase text-[#74BD25]">
                 Organic
               </span>
             </div>
