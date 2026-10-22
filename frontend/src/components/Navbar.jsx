@@ -54,28 +54,28 @@ function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-[#FDFBF7] border-b border-[#E8DCC4] py-1.5 sm:py-2 relative">
+    <header className="sticky top-0 z-50 bg-[#FDFBF7] border-b border-[#E8DCC4] py-1 md:py-1.5 relative">
       <div className="w-full px-4 sm:px-6 lg:px-8 flex items-center justify-between relative">
         
-        {/* Left Side: Mobile Menu Button + Logo + Brand Name */}
-        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+        {/* Left Side: Mobile Menu Button + Big Logo + Brand Name */}
+        <div className="flex items-center gap-2.5 sm:gap-3.5 shrink-0">
           {/* Mobile menu button */}
           <button 
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="md:hidden p-1.5 -ml-1 text-dark hover:text-primary transition-colors cursor-pointer"
             aria-label="Toggle mobile menu"
           >
-            {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
 
-          {/* Logo & Exact Logo Green Brand Text */}
-          <a href="/" onClick={handleHomeClick} className="flex items-center gap-2 sm:gap-2.5 group">
+          {/* Big Logo & Matching Green Brand Text */}
+          <a href="/" onClick={handleHomeClick} className="flex items-center gap-2.5 sm:gap-3 group">
             <img 
               src="/lao_logo_transparent.png" 
               alt="Lao Natural" 
-              className="h-11 sm:h-12 md:h-14 w-auto object-contain transition-transform duration-200 group-hover:scale-105" 
+              className="h-16 sm:h-18 md:h-20 w-auto object-contain transition-transform duration-200 group-hover:scale-105 drop-shadow-sm" 
             />
-            <span className="font-serif font-bold text-xl sm:text-2xl tracking-tight text-[#74BD25] hover:text-[#65A720] transition-colors whitespace-nowrap">
+            <span className="font-serif font-bold text-2xl sm:text-2xl md:text-3xl tracking-tight text-[#74BD25] hover:text-[#65A720] transition-colors whitespace-nowrap">
               Lao Natural
             </span>
           </a>
