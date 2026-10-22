@@ -54,39 +54,49 @@ function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-[#FDFBF7] border-b border-[#E8DCC4] py-4">
-      <div className="container mx-auto px-4 lg:px-8 flex items-center justify-between">
+    <header className="sticky top-0 z-50 bg-[#FDFBF7] border-b border-[#E8DCC4] py-3 md:py-3.5 relative">
+      <div className="w-full px-4 sm:px-6 lg:px-8 flex items-center justify-between relative">
         
-        {/* Mobile menu button */}
-        <button 
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden p-2 text-dark hover:text-primary transition-colors cursor-pointer"
-          aria-label="Toggle mobile menu"
-        >
-          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        {/* Left Side: Mobile Menu Button + Logo + Brand Name */}
+        <div className="flex items-center gap-2.5 sm:gap-3.5 shrink-0">
+          {/* Mobile menu button */}
+          <button 
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-1.5 -ml-1 text-dark hover:text-primary transition-colors cursor-pointer"
+            aria-label="Toggle mobile menu"
+          >
+            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
 
-        {/* Logo */}
-        <a href="/" onClick={handleHomeClick} className="flex-grow md:flex-grow-0 flex justify-center md:justify-start items-center">
-          <img src="/lao_logo_transparent.png" alt="Lao Natural" className="h-14 md:h-16 w-auto object-contain transition-transform duration-200 hover:scale-105" />
-        </a>
+          {/* Logo & Green Brand Text */}
+          <a href="/" onClick={handleHomeClick} className="flex items-center gap-2.5 sm:gap-3.5 group">
+            <img 
+              src="/lao_logo_transparent.png" 
+              alt="Lao Natural" 
+              className="h-14 sm:h-16 md:h-20 w-auto object-contain transition-transform duration-200 group-hover:scale-105 drop-shadow-sm" 
+            />
+            <span className="font-serif font-bold text-xl sm:text-2xl md:text-3xl tracking-tight text-[#8A9A5B] whitespace-nowrap">
+              Lao Natural
+            </span>
+          </a>
+        </div>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-8">
-          <a href="/" onClick={handleHomeClick} className="text-dark hover:text-primary transition-colors uppercase tracking-widest text-sm cursor-pointer">{t('home')}</a>
-          <a href="/products" onClick={handleShopClick} className="text-dark hover:text-primary transition-colors uppercase tracking-widest text-sm cursor-pointer">{t('shop')}</a>
-          <a href="/#story" onClick={handleOurStoryClick} className="text-dark hover:text-primary transition-colors uppercase tracking-widest text-sm cursor-pointer">{t('our_story')}</a>
+        {/* Center: Desktop Navigation (Pinned Exactly in Center) */}
+        <nav className="hidden md:flex items-center space-x-6 lg:space-x-10 absolute left-1/2 -translate-x-1/2 pointer-events-auto">
+          <a href="/" onClick={handleHomeClick} className="text-dark hover:text-primary transition-colors uppercase tracking-widest text-xs sm:text-sm font-semibold cursor-pointer">{t('home')}</a>
+          <a href="/products" onClick={handleShopClick} className="text-dark hover:text-primary transition-colors uppercase tracking-widest text-xs sm:text-sm font-semibold cursor-pointer">{t('shop')}</a>
+          <a href="/#story" onClick={handleOurStoryClick} className="text-dark hover:text-primary transition-colors uppercase tracking-widest text-xs sm:text-sm font-semibold cursor-pointer whitespace-nowrap">{t('our_story')}</a>
         </nav>
 
-        {/* Icons & Language Switcher */}
-        <div className="flex items-center space-x-4">
+        {/* Right Side: Language Switcher, Admin, My Account, Logout, Cart */}
+        <div className="flex items-center space-x-2.5 sm:space-x-3.5 lg:space-x-4 shrink-0 ml-auto">
           {/* Language Switcher */}
           <div className="flex items-center gap-1.5 border border-[#E8DCC4] px-2.5 py-1.5 rounded-full bg-white shadow-sm hover:border-[#8A9A5B] transition-colors">
             <Globe size={14} className="text-gray-400" />
             <select
               value={language}
               onChange={(e) => setLanguage(e.target.value)}
-              className="bg-transparent text-[10px] font-bold uppercase tracking-wider text-dark border-none cursor-pointer focus:outline-none hover:text-[#8A9A5B] transition-colors pr-1"
+              className="bg-transparent text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-dark border-none cursor-pointer focus:outline-none hover:text-[#8A9A5B] transition-colors pr-1"
             >
               <option value="en" className="bg-[#FDFBF7] text-dark">EN</option>
               <option value="la" className="bg-[#FDFBF7] text-dark">LA</option>
@@ -98,40 +108,40 @@ function Navbar() {
             <>
               {/* Role-based portal links */}
               {user.role === 'owner' && (
-                <Link to="/admin" className="hidden md:flex items-center gap-1.5 text-sm text-[#8A9A5B] hover:text-dark transition-colors">
-                  <Shield size={16} />
-                  <span className="text-xs uppercase tracking-widest">{t('admin')}</span>
+                <Link to="/admin" className="hidden md:flex items-center gap-1 text-xs uppercase tracking-widest text-[#8A9A5B] font-semibold hover:text-dark transition-colors whitespace-nowrap">
+                  <Shield size={15} />
+                  <span>{t('admin')}</span>
                 </Link>
               )}
               {(user.role === 'employee') && (
-                <Link to="/employee" className="hidden md:flex items-center gap-1.5 text-sm text-[#8A9A5B] hover:text-dark transition-colors">
-                  <Briefcase size={16} />
-                  <span className="text-xs uppercase tracking-widest">{t('portal')}</span>
+                <Link to="/employee" className="hidden md:flex items-center gap-1 text-xs uppercase tracking-widest text-[#8A9A5B] font-semibold hover:text-dark transition-colors whitespace-nowrap">
+                  <Briefcase size={15} />
+                  <span>{t('portal')}</span>
                 </Link>
               )}
             </>
           )}
 
           {user ? (
-            <div className="flex items-center space-x-4">
-              <Link to="/dashboard" className="text-dark hover:text-primary transition-colors hidden md:block text-xs uppercase tracking-widest">{t('my_account')}</Link>
-              <button onClick={handleLogout} className="text-dark hover:text-primary transition-colors hidden md:block text-xs uppercase tracking-widest">{t('logout')}</button>
+            <div className="flex items-center space-x-2.5 sm:space-x-3.5 lg:space-x-4">
+              <Link to="/dashboard" className="text-dark hover:text-primary transition-colors hidden md:block text-xs uppercase tracking-widest font-semibold whitespace-nowrap">{t('my_account')}</Link>
+              <button onClick={handleLogout} className="text-dark hover:text-primary transition-colors hidden md:block text-xs uppercase tracking-widest font-semibold cursor-pointer whitespace-nowrap">{t('logout')}</button>
               <Link to="/dashboard" className="text-dark hover:text-primary transition-colors md:hidden">
                 <User size={20} />
               </Link>
             </div>
           ) : (
-            <Link to="/login" className="flex items-center gap-1.5 text-dark hover:text-primary transition-colors">
-              <User size={20} />
-              <span className="hidden md:inline-block text-xs uppercase tracking-widest">{t('sign_in')}</span>
+            <Link to="/login" className="flex items-center gap-1 text-dark hover:text-primary transition-colors text-xs uppercase tracking-widest font-semibold whitespace-nowrap">
+              <User size={18} />
+              <span className="hidden md:inline-block">{t('sign_in')}</span>
             </Link>
           )}
           
-          <Link to="/cart" className="relative flex items-center gap-1.5 text-dark hover:text-primary transition-colors">
-            <ShoppingBag size={20} />
-            <span className="hidden md:inline-block text-xs uppercase tracking-widest">{t('cart')}</span>
+          <Link to="/cart" className="relative flex items-center gap-1 text-dark hover:text-primary transition-colors text-xs uppercase tracking-widest font-semibold whitespace-nowrap pl-1">
+            <ShoppingBag size={19} />
+            <span className="hidden md:inline-block">{t('cart')}</span>
             {count > 0 && (
-              <span className="absolute -top-2 -right-2 bg-primary text-secondary text-xs font-bold rounded-full h-4 w-4 flex items-center justify-center">
+              <span className="absolute -top-2 -right-2 bg-primary text-secondary text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
                 {count}
               </span>
             )}
