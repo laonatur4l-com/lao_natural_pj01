@@ -67,8 +67,8 @@ function Navbar() {
         </button>
 
         {/* Logo */}
-        <a href="/" onClick={handleHomeClick} className="flex-grow md:flex-grow-0 flex justify-center md:justify-start">
-          <img src="/lao_logo_transparent.png" alt="Lao Natural" className="h-10 w-auto object-contain" />
+        <a href="/" onClick={handleHomeClick} className="flex-grow md:flex-grow-0 flex justify-center md:justify-start items-center">
+          <img src="/lao_logo_transparent.png" alt="Lao Natural" className="h-14 md:h-16 w-auto object-contain transition-transform duration-200 hover:scale-105" />
         </a>
 
         {/* Desktop Navigation */}

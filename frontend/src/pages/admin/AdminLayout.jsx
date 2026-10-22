@@ -40,7 +40,7 @@ function AdminLayout() {
       <aside className="w-64 bg-[#2C2C2C] text-white flex flex-col shrink-0 print:hidden sticky top-0 h-screen">
         <div className="p-6 border-b border-white/10">
           <Link to="/" className="block mb-4">
-            <img src="/lao_logo_transparent.png" alt="Lao Natural" className="h-12 w-auto object-contain drop-shadow-md" />
+            <img src="/lao_logo_transparent.png" alt="Lao Natural" className="h-14 w-auto object-contain drop-shadow-md transition-transform duration-200 hover:scale-105" />
           </Link>
           <div className="flex justify-between items-start">
             <div>
