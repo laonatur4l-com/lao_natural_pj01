@@ -68,16 +68,21 @@ function Navbar() {
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
 
-          {/* Big Logo & Matching Green Brand Text */}
+          {/* Big Logo & Matching Comfortaa Brand Text Lockup */}
           <a href="/" onClick={handleHomeClick} className="flex items-center gap-2.5 sm:gap-3 group">
             <img 
               src="/lao_logo_transparent.png" 
               alt="Lao Natural" 
               className="h-16 sm:h-18 md:h-20 w-auto object-contain transition-transform duration-200 group-hover:scale-105 drop-shadow-sm" 
             />
-            <span className="font-serif font-bold text-2xl sm:text-2xl md:text-3xl tracking-tight text-[#74BD25] hover:text-[#65A720] transition-colors whitespace-nowrap">
-              Lao Natural
-            </span>
+            <div className="flex flex-col justify-center leading-none">
+              <span className="font-brand font-bold text-2xl sm:text-2xl md:text-3xl tracking-tight text-[#74BD25] group-hover:text-[#65A720] transition-colors whitespace-nowrap">
+                Lao Natural
+              </span>
+              <span className="font-brand font-bold text-[11px] sm:text-xs md:text-sm tracking-[0.25em] uppercase text-[#74BD25] mt-0.5 sm:mt-1 whitespace-nowrap">
+                Organic
+              </span>
+            </div>
           </a>
         </div>
 

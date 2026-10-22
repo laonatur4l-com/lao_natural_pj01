@@ -44,7 +44,14 @@ function Footer() {
         <div>
           <div className="flex items-center gap-3.5 mb-4">
             <img src="/lao_logo_transparent.png" alt="Lao Natural" className="h-14 md:h-16 w-auto object-contain drop-shadow-md" />
-            <h3 className="font-serif text-2xl md:text-3xl text-[#E8DCC4]">Lao Natural</h3>
+            <div className="flex flex-col justify-center leading-none">
+              <span className="font-brand font-bold text-2xl md:text-3xl tracking-tight text-[#E8DCC4]">
+                Lao Natural
+              </span>
+              <span className="font-brand font-bold text-xs tracking-[0.25em] uppercase text-[#74BD25] mt-1">
+                Organic
+              </span>
+            </div>
           </div>
           <p className="text-sm opacity-80 max-w-xs leading-relaxed font-light">
             {t('footer_desc')}
