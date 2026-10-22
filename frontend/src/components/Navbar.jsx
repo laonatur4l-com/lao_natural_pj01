@@ -68,15 +68,15 @@ function Navbar() {
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
 
-          {/* Scaled-up Logo & Single-Line Brand Name */}
-          <a href="/" onClick={handleHomeClick} className="flex items-center gap-3 sm:gap-4 group">
+          {/* Logo & Company Name Underneath */}
+          <a href="/" onClick={handleHomeClick} className="flex flex-col items-center justify-center group">
             <img 
               src="/lao_logo_transparent.png" 
-              alt="Lao Natural and Organic" 
-              className="h-20 sm:h-24 md:h-28 w-auto object-contain transition-transform duration-200 group-hover:scale-105" 
+              alt="LAO NATURAL and Organic Co.,Ltd" 
+              className="h-16 sm:h-18 md:h-20 w-auto object-contain transition-transform duration-200 group-hover:scale-105" 
             />
-            <span className="font-brand font-black text-base sm:text-lg md:text-xl lg:text-2xl tracking-tight text-[#74BD25] group-hover:text-[#65A720] transition-colors whitespace-nowrap">
-              Lao Natural and Organic
+            <span className="font-brand font-bold text-[9px] sm:text-[10px] md:text-[11px] tracking-tight text-[#74BD25] group-hover:text-[#65A720] transition-colors whitespace-nowrap mt-0.5 text-center">
+              LAO NATURAL and Organic Co.,Ltd
             </span>
           </a>
         </div>
