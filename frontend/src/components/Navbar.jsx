@@ -75,14 +75,14 @@ function Navbar() {
               alt="Lao Natural" 
               className="h-16 sm:h-18 md:h-20 w-auto object-contain transition-transform duration-200 group-hover:scale-105" 
             />
-            <div className="flex flex-col justify-center leading-tight">
+            <div className="flex flex-col justify-center items-center text-center leading-tight">
               <span className="font-brand font-black text-base sm:text-lg md:text-xl tracking-tight text-[#74BD25] group-hover:text-[#65A720] transition-colors whitespace-nowrap">
                 Lao Natural
               </span>
-              <span className="font-brand font-bold text-[10px] sm:text-[11px] md:text-xs tracking-wider lowercase text-[#74BD25] opacity-80 whitespace-nowrap my-0.5">
+              <span className="font-brand font-black text-base sm:text-lg md:text-xl tracking-tight text-[#74BD25] group-hover:text-[#65A720] transition-colors whitespace-nowrap self-center">
                 and
               </span>
-              <span className="font-brand font-extrabold text-xs sm:text-sm md:text-base tracking-[0.2em] uppercase text-[#74BD25] whitespace-nowrap">
+              <span className="font-brand font-black text-base sm:text-lg md:text-xl tracking-tight text-[#74BD25] group-hover:text-[#65A720] transition-colors whitespace-nowrap">
                 Organic
               </span>
             </div>

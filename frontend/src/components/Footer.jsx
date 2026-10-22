@@ -44,14 +44,14 @@ function Footer() {
         <div>
           <div className="flex items-center gap-3.5 mb-4">
             <img src="/lao_logo_transparent.png" alt="Lao Natural" className="h-16 md:h-18 w-auto object-contain drop-shadow-md" />
-            <div className="flex flex-col justify-center leading-tight">
-              <span className="font-brand font-black text-lg md:text-xl tracking-tight text-[#E8DCC4]">
+            <div className="flex flex-col justify-center items-center text-center leading-tight">
+              <span className="font-brand font-black text-base md:text-lg tracking-tight text-[#E8DCC4] whitespace-nowrap">
                 Lao Natural
               </span>
-              <span className="font-brand font-bold text-[10px] md:text-[11px] tracking-wider lowercase text-[#74BD25] opacity-80 my-0.5">
+              <span className="font-brand font-black text-base md:text-lg tracking-tight text-[#74BD25] whitespace-nowrap self-center">
                 and
               </span>
-              <span className="font-brand font-extrabold text-xs md:text-sm tracking-[0.2em] uppercase text-[#74BD25]">
+              <span className="font-brand font-black text-base md:text-lg tracking-tight text-[#74BD25] whitespace-nowrap">
                 Organic
               </span>
             </div>
