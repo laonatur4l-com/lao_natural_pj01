@@ -68,24 +68,16 @@ function Navbar() {
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
 
-          {/* Logo & Solid Bold Brand Lockup (Lao Natural / and / Organic) */}
-          <a href="/" onClick={handleHomeClick} className="flex items-center gap-2.5 sm:gap-3.5 group">
+          {/* Scaled-up Logo & Single-Line Brand Name */}
+          <a href="/" onClick={handleHomeClick} className="flex items-center gap-3 sm:gap-4 group">
             <img 
               src="/lao_logo_transparent.png" 
-              alt="Lao Natural" 
-              className="h-16 sm:h-18 md:h-20 w-auto object-contain transition-transform duration-200 group-hover:scale-105" 
+              alt="Lao Natural and Organic" 
+              className="h-20 sm:h-24 md:h-28 w-auto object-contain transition-transform duration-200 group-hover:scale-105" 
             />
-            <div className="flex flex-col justify-center items-center text-center leading-tight">
-              <span className="font-brand font-black text-base sm:text-lg md:text-xl tracking-tight text-[#74BD25] group-hover:text-[#65A720] transition-colors whitespace-nowrap">
-                Lao Natural
-              </span>
-              <span className="font-brand font-black text-base sm:text-lg md:text-xl tracking-tight text-[#74BD25] group-hover:text-[#65A720] transition-colors whitespace-nowrap self-center">
-                and
-              </span>
-              <span className="font-brand font-black text-base sm:text-lg md:text-xl tracking-tight text-[#74BD25] group-hover:text-[#65A720] transition-colors whitespace-nowrap">
-                Organic
-              </span>
-            </div>
+            <span className="font-brand font-black text-base sm:text-lg md:text-xl lg:text-2xl tracking-tight text-[#74BD25] group-hover:text-[#65A720] transition-colors whitespace-nowrap">
+              Lao Natural and Organic
+            </span>
           </a>
         </div>
 
