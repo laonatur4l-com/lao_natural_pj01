@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Lao:wght@300;400;500;600;700;800;900&family=Noto+Sans+Thai:wght@300;400;500;600;700;800;900&family=Noto+Sans:wght@300;400;500;600;700;800;900&family=Outfit:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800;900&family=Montserrat:wght@700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Lao:wght@300;400;500;600;700;800;900&family=Noto+Sans+Thai:wght@300;400;500;600;700;800;900&family=Noto+Sans:wght@300;400;500;600;700;800;900&family=Outfit:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800;900&family=Montserrat:wght@700;800;900&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -11,11 +11,17 @@
   --font-sans: "Inter", "Noto Sans Lao", "Noto Sans Thai", "Noto Sans", sans-serif;
   --font-serif: "Inter", "Noto Sans Lao", "Noto Sans Thai", "Noto Sans", sans-serif;
   --font-brand: "Outfit", "Plus Jakarta Sans", "Montserrat", sans-serif;
+  --font-manrope: "Manrope", sans-serif;
 }
 
 .font-brand,
 .font-brand * {
   font-family: "Outfit", "Plus Jakarta Sans", "Montserrat", system-ui, -apple-system, sans-serif !important;
+}
+
+.font-manrope,
+.font-manrope * {
+  font-family: "Manrope", "Noto Sans Lao", "Noto Sans Thai", "Inter", sans-serif !important;
 }
 
 @layer base {
@@ -25,14 +31,14 @@
   }
 
   /* Universal typography across all headings, labels, prices, paragraphs, and overrides */
-  h1:not(.font-brand), h2:not(.font-brand), h3:not(.font-brand), h4:not(.font-brand), h5:not(.font-brand), h6:not(.font-brand),
-  p:not(.font-brand), span:not(.font-brand), a:not(.font-brand),
-  button:not(.font-brand), input:not(.font-brand), select:not(.font-brand), textarea:not(.font-brand),
-  .font-serif:not(.font-brand),
-  .uppercase:not(.font-brand),
-  .tracking-widest:not(.font-brand),
-  .tracking-wider:not(.font-brand),
-  .font-mono:not(.font-brand) {
+  h1:not(.font-brand):not(.font-manrope), h2:not(.font-brand):not(.font-manrope), h3:not(.font-brand):not(.font-manrope), h4:not(.font-brand):not(.font-manrope), h5:not(.font-brand):not(.font-manrope), h6:not(.font-brand):not(.font-manrope),
+  p:not(.font-brand):not(.font-manrope), span:not(.font-brand):not(.font-manrope), a:not(.font-brand):not(.font-manrope),
+  button:not(.font-brand):not(.font-manrope), input:not(.font-brand):not(.font-manrope), select:not(.font-brand):not(.font-manrope), textarea:not(.font-brand):not(.font-manrope),
+  .font-serif:not(.font-brand):not(.font-manrope),
+  .uppercase:not(.font-brand):not(.font-manrope),
+  .tracking-widest:not(.font-brand):not(.font-manrope),
+  .tracking-wider:not(.font-brand):not(.font-manrope),
+  .font-mono:not(.font-brand):not(.font-manrope) {
     font-family: "Inter", "Noto Sans Lao", "Noto Sans Thai", "Noto Sans", -apple-system, BlinkMacSystemFont, sans-serif !important;
   }
 
