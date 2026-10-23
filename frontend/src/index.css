@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800;900&family=Montserrat:wght@700;800;900&family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Lao:wght@300;400;500;600;700;800&family=Noto+Sans+Thai:wght@300;400;500;600;700;800&family=Noto+Sans:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Lao:wght@300;400;500;600;700;800;900&family=Noto+Sans+Thai:wght@300;400;500;600;700;800;900&family=Noto+Sans:wght@300;400;500;600;700;800;900&family=Outfit:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800;900&family=Montserrat:wght@700;800;900&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -8,8 +8,8 @@
   --color-secondary-dark: #e6e6cc;
   --color-accent: #E8DCC4; /* Warm Sand */
   --color-dark: #2C2C2C; /* Off-black */
-  --font-sans: "Noto Sans Lao", "Noto Sans", "Inter", sans-serif;
-  --font-serif: "Noto Sans Lao", "Noto Sans", "Inter", sans-serif;
+  --font-sans: "Inter", "Noto Sans Lao", "Noto Sans Thai", "Noto Sans", sans-serif;
+  --font-serif: "Inter", "Noto Sans Lao", "Noto Sans Thai", "Noto Sans", sans-serif;
   --font-brand: "Outfit", "Plus Jakarta Sans", "Montserrat", sans-serif;
 }
 
@@ -21,57 +21,88 @@
 @layer base {
   body {
     @apply font-sans bg-[#FDFBF7] text-dark antialiased;
-    font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: "Inter", "Noto Sans Lao", "Noto Sans Thai", "Noto Sans", -apple-system, BlinkMacSystemFont, sans-serif;
   }
 
-  /* Force clean sans-serif for all headings, labels, prices, and font-serif overrides */
+  /* Universal typography across all headings, labels, prices, paragraphs, and overrides */
   h1:not(.font-brand), h2:not(.font-brand), h3:not(.font-brand), h4:not(.font-brand), h5:not(.font-brand), h6:not(.font-brand),
+  p:not(.font-brand), span:not(.font-brand), a:not(.font-brand),
+  button:not(.font-brand), input:not(.font-brand), select:not(.font-brand), textarea:not(.font-brand),
   .font-serif:not(.font-brand),
   .uppercase:not(.font-brand),
   .tracking-widest:not(.font-brand),
   .tracking-wider:not(.font-brand),
   .font-mono:not(.font-brand) {
-    font-family: "Noto Sans Lao", "Noto Sans", "Inter", sans-serif !important;
+    font-family: "Inter", "Noto Sans Lao", "Noto Sans Thai", "Noto Sans", -apple-system, BlinkMacSystemFont, sans-serif !important;
   }
 
   /* Invoice Print Sheet font family rule */
   #print-area,
   #print-area * {
-    font-family: "Noto Sans Lao", "Noto Sans", "Inter", sans-serif !important;
+    font-family: "Noto Sans Lao", "Noto Sans Thai", "Noto Sans", "Inter", sans-serif !important;
   }
 
-  /* Lao Language Font Override */
+  /* Lao Language Font Override - prioritize Noto Sans Lao */
+  html[lang="la"],
   html[lang="la"] body,
-  html[lang="la"] button,
-  html[lang="la"] input,
-  html[lang="la"] textarea,
-  html[lang="la"] select,
-  html[lang="la"] h1,
-  html[lang="la"] h2,
-  html[lang="la"] h3,
-  html[lang="la"] h4,
-  html[lang="la"] h5,
-  html[lang="la"] h6,
-  html[lang="la"] .font-serif,
-  html[lang="la"] .uppercase {
-    font-family: "Noto Sans Lao", "Inter", sans-serif !important;
+  html[lang="la"] button:not(.font-brand),
+  html[lang="la"] input:not(.font-brand),
+  html[lang="la"] textarea:not(.font-brand),
+  html[lang="la"] select:not(.font-brand),
+  html[lang="la"] p:not(.font-brand),
+  html[lang="la"] span:not(.font-brand),
+  html[lang="la"] a:not(.font-brand),
+  html[lang="la"] h1:not(.font-brand),
+  html[lang="la"] h2:not(.font-brand),
+  html[lang="la"] h3:not(.font-brand),
+  html[lang="la"] h4:not(.font-brand),
+  html[lang="la"] h5:not(.font-brand),
+  html[lang="la"] h6:not(.font-brand),
+  html[lang="la"] .font-serif:not(.font-brand),
+  html[lang="la"] .uppercase:not(.font-brand) {
+    font-family: "Noto Sans Lao", "Inter", "Noto Sans Thai", "Noto Sans", sans-serif !important;
   }
 
-  /* Thai Language Font Override */
+  /* Thai Language Font Override - prioritize Noto Sans Thai, while still rendering Lao text in Noto Sans Lao */
+  html[lang="th"],
   html[lang="th"] body,
-  html[lang="th"] button,
-  html[lang="th"] input,
-  html[lang="th"] textarea,
-  html[lang="th"] select,
-  html[lang="th"] h1,
-  html[lang="th"] h2,
-  html[lang="th"] h3,
-  html[lang="th"] h4,
-  html[lang="th"] h5,
-  html[lang="th"] h6,
-  html[lang="th"] .font-serif,
-  html[lang="th"] .uppercase {
-    font-family: "Noto Sans Thai", "Inter", sans-serif !important;
+  html[lang="th"] button:not(.font-brand),
+  html[lang="th"] input:not(.font-brand),
+  html[lang="th"] textarea:not(.font-brand),
+  html[lang="th"] select:not(.font-brand),
+  html[lang="th"] p:not(.font-brand),
+  html[lang="th"] span:not(.font-brand),
+  html[lang="th"] a:not(.font-brand),
+  html[lang="th"] h1:not(.font-brand),
+  html[lang="th"] h2:not(.font-brand),
+  html[lang="th"] h3:not(.font-brand),
+  html[lang="th"] h4:not(.font-brand),
+  html[lang="th"] h5:not(.font-brand),
+  html[lang="th"] h6:not(.font-brand),
+  html[lang="th"] .font-serif:not(.font-brand),
+  html[lang="th"] .uppercase:not(.font-brand) {
+    font-family: "Noto Sans Thai", "Noto Sans Lao", "Inter", "Noto Sans", sans-serif !important;
+  }
+
+  /* English Language Font Override - prioritize Inter, while still rendering Lao text in Noto Sans Lao and Thai in Noto Sans Thai */
+  html[lang="en"],
+  html[lang="en"] body,
+  html[lang="en"] button:not(.font-brand),
+  html[lang="en"] input:not(.font-brand),
+  html[lang="en"] textarea:not(.font-brand),
+  html[lang="en"] select:not(.font-brand),
+  html[lang="en"] p:not(.font-brand),
+  html[lang="en"] span:not(.font-brand),
+  html[lang="en"] a:not(.font-brand),
+  html[lang="en"] h1:not(.font-brand),
+  html[lang="en"] h2:not(.font-brand),
+  html[lang="en"] h3:not(.font-brand),
+  html[lang="en"] h4:not(.font-brand),
+  html[lang="en"] h5:not(.font-brand),
+  html[lang="en"] h6:not(.font-brand),
+  html[lang="en"] .font-serif:not(.font-brand),
+  html[lang="en"] .uppercase:not(.font-brand) {
+    font-family: "Inter", "Noto Sans Lao", "Noto Sans Thai", "Noto Sans", sans-serif !important;
   }
 
   /* Hide native number input spinner arrows */
