@@ -44,7 +44,7 @@ function Home() {
         setLoading(false);
       }
     };
-    
+
     const fetchBanners = async () => {
       try {
         const res = await api.get('/banners?type=hero');
@@ -119,18 +119,17 @@ function Home() {
       <section className="relative h-[80vh] flex items-center justify-center bg-gray-100 overflow-hidden">
         {/* Absolute Slider Images with smooth cross-fade */}
         {banners.map((url, idx) => (
-          <div 
+          <div
             key={idx}
-            className={`absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ease-in-out ${
-              idx === currentBannerIndex ? 'opacity-100 z-0' : 'opacity-0 z-0'
-            }`}
+            className={`absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ease-in-out ${idx === currentBannerIndex ? 'opacity-100 z-0' : 'opacity-0 z-0'
+              }`}
             style={{ backgroundImage: `url('${url}')` }}
           />
         ))}
-        
+
         {/* Transparent legible front overlay backdrop */}
         <div className="absolute inset-0 bg-black/15 z-10"></div>
-        
+
         {/* Fixed Overlay Typography */}
         <div className="relative z-20 text-center px-6 md:px-12 animate-fade-in py-12 max-w-4xl mx-auto">
           <h1 className="text-5xl md:text-7xl text-white font-serif mb-6 tracking-wide leading-tight drop-shadow-md">
@@ -159,7 +158,7 @@ function Home() {
             </div>
             <Link to="/products" className="text-sm uppercase tracking-widest text-[#8A9A5B] hover:text-dark transition border-b border-transparent hover:border-dark pb-1">{t('view_all')}</Link>
           </div>
-          
+
           {loading ? (
             <div className="flex items-center justify-center py-12">
               <div className="w-6 h-6 border-2 border-[#8A9A5B] border-t-transparent rounded-full animate-spin"></div>
@@ -180,10 +179,10 @@ function Home() {
                   <Link to={`/product/${product.id}`} key={product.id} className="group overflow-hidden flex flex-col h-full bg-[#FDFBF7] border border-[#E8DCC4]/30 hover:border-[#8A9A5B]/30 hover:shadow-sm transition-all duration-300 relative">
                     <div className="bg-[#fcfbf9] aspect-square relative overflow-hidden border-b border-gray-100 flex items-center justify-center p-4">
                       {product.image_url ? (
-                        <img 
-                          src={product.image_url} 
-                          alt={product.name} 
-                          className="h-full w-full object-contain group-hover:scale-105 transition-transform duration-500" 
+                        <img
+                          src={product.image_url}
+                          alt={product.name}
+                          className="h-full w-full object-contain group-hover:scale-105 transition-transform duration-500"
                         />
                       ) : (
                         <div className="text-gray-300 text-xs font-serif uppercase tracking-widest">Natural Care</div>
@@ -200,7 +199,7 @@ function Home() {
                         Best Seller
                       </div>
                     </div>
-                    
+
                     <div className="p-5 flex-1 flex flex-col">
                       <span className="text-[10px] uppercase tracking-widest text-gray-400 mb-1">{product.category}</span>
                       <h3 className="font-serif text-base text-dark mb-1 group-hover:text-[#8A9A5B] transition-colors">{product.name}</h3>
@@ -240,8 +239,8 @@ function Home() {
       <section id="story" className="py-24 bg-[#F5F2EA] text-dark border-t border-b border-[#E8DCC4] border-opacity-40">
         <div className="container mx-auto px-4 lg:px-8 max-w-5xl">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-serif mb-6 text-primary uppercase tracking-widest">{t('story_title')}</h2>
-            <div className="w-16 h-px bg-primary mx-auto mb-6"></div>
+            <h2 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-widest text-primary uppercase mb-6">{t('story_title')}</h2>
+            <div className="w-20 md:w-24 h-1 bg-primary mx-auto mb-6 rounded-full"></div>
             <p className="text-lg text-gray-700 max-w-2xl mx-auto font-light leading-relaxed">
               {t('story_subtitle')}
             </p>
@@ -281,7 +280,7 @@ function Home() {
       {/* Our Clients */}
       <section className="py-20 bg-[#FDFBF7] overflow-hidden">
         <div className="container mx-auto px-4 lg:px-8 mb-12">
-          <h2 className="text-3xl font-serif mb-4 text-center text-dark">{t('clients_title') !== 'clients_title' ? t('clients_title') : 'Some of Our Clients'}</h2>
+          <h2 className="text-3xl font-serif mb-4 text-center text-dark">{t('clients_title') !== 'clients_title' ? t('clients_title') : 'Our Clients'}</h2>
           <p className="text-center text-gray-500 max-w-2xl mx-auto text-sm font-light">{t('clients_subtitle') !== 'clients_subtitle' ? t('clients_subtitle') : 'Trusted by leading hotels, resorts and businesses across Laos'}</p>
         </div>
 
@@ -336,7 +335,7 @@ function Home() {
             // Select items for this row (every 3rd item starting from rowIndex)
             const rowItems = activeClients.filter((_, idx) => idx % 3 === rowIndex);
             if (rowItems.length === 0) return [];
-            
+
             // Duplicate rowItems until we have at least 8 elements for width/seamless scroll
             let list = [...rowItems];
             while (list.length < 8) {
